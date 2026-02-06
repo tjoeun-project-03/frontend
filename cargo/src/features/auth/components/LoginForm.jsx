@@ -1,11 +1,12 @@
-// src/features/auth/components/LoginForm.jsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useLogin } from '../hooks/useLogin'; // 뇌(Hook) 가져오기
 
 const LoginForm = () => {
-  // 복잡한 코드는 다 사라지고, 딱 한 줄로 기능 장착!
+  const navigate = useNavigate();
+
   const { 
     formData, 
     error, 
@@ -14,6 +15,12 @@ const LoginForm = () => {
     handleSubmit 
   } = useLogin();
 
+  const handleLoginSubmit = async (e) => {
+    const isSuccess = await handleSubmit(e);
+
+    if(isSuccess) navigate('/dashboard');
+  };
+
   return (
     <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100">
       <div className="text-center mb-8">
@@ -21,7 +28,7 @@ const LoginForm = () => {
         <p className="text-gray-500 mt-2">화물 운송 관리 시스템</p>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLoginSubmit}>
         {/* 에러 메시지 */}
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-lg">
@@ -31,9 +38,9 @@ const LoginForm = () => {
 
         <Input
           label="아이디"
-          name="username"
+          name="id"
           placeholder="아이디"
-          value={formData.username}
+          value={formData.id}
           onChange={handleChange}
         />
         <Input
