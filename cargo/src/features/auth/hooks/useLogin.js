@@ -27,12 +27,22 @@ export const useLogin = () => {
 
     try {
       // API 호출
-      // const result = await loginUser(formData.id, formData.password);
+      const result = await loginUser(formData.id, formData.password);
+      console.log('로그인 결과 데이터:', result); // token 변수명이 뭐라고 되어있는지 확인해야 됨
+      if(result.accessToken) {
+        localStorage.setItem('token', result.accessToken);
+      }
+      alert('로그인 되었습니다');
+      return true;
+      
+      /*
       if(formData.id == "admin" && formData.password == "1234") {
         alert('로그인 되었습니다');
         // 성공 시 true 반환 (나중에 페이지 이동에 씀)
         return true;
       } else throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
+      */
+
     } catch (err) {
       console.error('로그인 실패:', err);
       setError('아이디 또는 비밀번호가 틀렸습니다.');

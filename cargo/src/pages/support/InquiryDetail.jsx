@@ -13,6 +13,7 @@ export const InquiryDetail = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // 임시 데이터 (실제로는 API 호출)
     const mockInquiries = [
       { 
         id: 1, 
@@ -35,113 +36,105 @@ export const InquiryDetail = () => {
       },
     ];
 
-    // URL의 id와 일치하는 데이터 찾기
     const found = mockInquiries.find(item => item.id === parseInt(id));
     setInquiry(found);
     
-    // 이미 답변이 있으면 답변 칸에 채워두기
     if (found && found.answer) {
       setReply(found.answer);
     }
   }, [id]);
 
-  // 3. 답변 등록 핸들러
   const handleSubmit = () => {
     if (!reply.trim()) return alert('답변 내용을 입력해주세요.');
-    
     setIsSubmitting(true);
-    
-    // 서버에 저장하는 척 1초 대기
     setTimeout(() => {
       alert('답변이 등록되었습니다!');
       setIsSubmitting(false);
-      navigate('/support/reports'); // 리스트로 돌아가기
+      navigate('/support/reports');
     }, 1000);
   };
 
-  // 로딩 중일 때
   if (!inquiry) return <AdminLayout><div>로딩 중...</div></AdminLayout>;
 
   return (
     <AdminLayout>
+      {/* 1. 상단 네비게이션 */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">문의 상세 내역</h2>
         <button 
           onClick={() => navigate(-1)} 
-          className="text-gray-500 hover:text-gray-700 font-medium"
+          className="text-gray-500 hover:text-gray-700 font-medium px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
           ← 목록으로 돌아가기
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 왼쪽: 문의 내용 (읽기 전용) */}
-        <div className="lg:col-span-2 space-y-6">
+      {/* 🌟 수정 포인트: Grid 제거하고 최대 너비(max-w-4xl) 설정으로 중앙 정렬 */}
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* 2. 질문 카드 (여기에 상태 뱃지 통합) */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           
-          {/* 1. 질문 카드 */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-start mb-4">
-              <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold">
+          {/* 헤더 영역: 카테고리 + 날짜 + 상태뱃지 */}
+          <div className="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              {/* 카테고리 뱃지 */}
+              <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-md text-xs font-bold">
                 {inquiry.category}
               </span>
-              <span className="text-gray-400 text-sm">{inquiry.date}</span>
-            </div>
-            
-            <h3 className="text-xl font-bold text-gray-900 mb-4">{inquiry.title}</h3>
-            
-            <div className="bg-gray-50 p-4 rounded-lg text-gray-700 leading-relaxed whitespace-pre-line min-h-[150px]">
-              {inquiry.content}
-            </div>
-
-            <div className="mt-4 flex items-center text-sm text-gray-500">
-              <span className="font-semibold mr-2">작성자:</span> {inquiry.author}
-            </div>
-          </div>
-
-          {/* 2. 답변 작성 영역 */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h4 className="text-lg font-bold text-gray-800 mb-4">
-              관리자 답변
-              {inquiry.status === 'completed' && <span className="ml-2 text-green-600 text-sm">(답변 완료됨)</span>}
-            </h4>
-            
-            <textarea
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder="여기에 답변 내용을 입력하세요..."
-              className="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-gray-700"
-            />
-
-            <div className="mt-4 flex justify-end">
-              <Button onClick={handleSubmit} disabled={isSubmitting}>
-                {isSubmitting ? '등록 중...' : '답변 등록하기'}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* 오른쪽: 상태 요약 정보 (사이드 패널) */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h4 className="font-bold text-gray-800 mb-4">처리 상태</h4>
-            
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-gray-500">현재 상태</span>
+              
+              {/* 🌟 상태 뱃지 */}
               {inquiry.status === 'completed' ? (
-                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-bold">답변 완료</span>
+                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-md text-xs font-bold flex items-center gap-1">
+                  ✅ 답변 완료
+                </span>
               ) : (
-                <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold">답변 대기</span>
+                <span className="px-3 py-1 bg-red-100 text-red-700 rounded-md text-xs font-bold flex items-center gap-1">
+                  🔥 답변 대기
+                </span>
               )}
             </div>
 
-            <hr className="my-4 border-gray-100" />
-            
-            <div className="text-sm text-gray-500 space-y-2">
-              <p>• 답변을 등록하면 사용자에게 알림이 전송됩니다.</p>
-              <p>• 부적절한 문의는 '사용자 제재' 메뉴에서 처리하세요.</p>
+            {/* 날짜 & 작성자 */}
+            <div className="text-right">
+              <p className="text-sm font-bold text-gray-900">{inquiry.author}</p>
+              <p className="text-xs text-gray-400 mt-1">{inquiry.date}</p>
             </div>
           </div>
+          
+          {/* 질문 본문 */}
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">{inquiry.title}</h3>
+          <div className="bg-gray-50 p-6 rounded-xl text-gray-700 leading-relaxed whitespace-pre-line text-base">
+            {inquiry.content}
+          </div>
         </div>
+
+        {/* 3. 답변 작성 영역 (화살표 아이콘으로 연결 느낌) */}
+        <div className="flex justify-center text-gray-300">
+          <svg className="w-8 h-8 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+
+        <div className={`rounded-xl shadow-sm border p-8 transition-colors ${
+           inquiry.status === 'completed' ? 'bg-blue-50 border-blue-100' : 'bg-white border-gray-200'
+        }`}>
+          <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span>💬 관리자 답변</span>
+          </h4>
+          
+          <textarea
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            placeholder="사용자가 기다리고 있습니다. 친절하게 답변해 주세요."
+            className="w-full h-48 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-gray-700 bg-white"
+          />
+
+          <div className="mt-6 flex justify-end">
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? '등록 중...' : '답변 등록하기'}
+            </Button>
+          </div>
+        </div>
+
       </div>
     </AdminLayout>
   );
