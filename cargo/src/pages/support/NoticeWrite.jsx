@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button';
-import Input from '../../components/Input'; // 기존 Input 재사용
+import React, { useState, useEffect } from 'react'; // 1. useEffect 추가
+import {useParams } from 'react-router-dom'; // 2. useNavigate, useParams 추가
 
 export const NoticeWrite = () => {
   const navigate = useNavigate();
+  const {id} = useParams(); // url에서 id 가져오기
+
+  const isEditMode = Boolean(id); // id가 있으면 ture (수정모드), 없으면 false (등록모드)
 
   // 입력 데이터 관리
   const [form, setForm] = useState({
@@ -13,6 +16,24 @@ export const NoticeWrite = () => {
     content: '',
     isPinned: false, // 상단 고정 여부
   });
+
+  useEffect(() => {
+    if (isEditMode) {
+      const mockData = {
+        id: 10,
+        title: '🚨 [긴급] 서버 점검 안내 (02/12 00:00 ~ 04:00)',
+        content: `안녕하세요, 화물 관리자 팀입니다.\n\n안정적인 서비스 제공을 위해...`,
+        isPinned: true
+      };
+
+      // 가져온 데이터를 폼에 채워넣기
+      setForm({
+        title: mockData.title,
+        content: mockData.content,
+        isPinned: mockData.isPinned
+      });
+    }
+  }, [id, isEditMode]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
