@@ -30,7 +30,7 @@ const Sidebar = () => {
       items: [
         { name: "신고 심사", path: "/" },
         { name: "1:1 문의 답변", path: "/support/inquiry"},
-        { name: "공지사항 관리", path: "/" },
+        { name: "공지사항 관리", path: "/support/notice" },
       ]
     }
   ];
