@@ -6,10 +6,10 @@ export const DashboardPage = () => {
     <AdminLayout>
       {/* 1. 요약 카드 영역 (통계) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <StatCard title="오늘 배차 완료" value="128 건" color="bg-blue-500" />
-        <StatCard title="신규 차주 가입" value="3 명" color="bg-green-500" />
-        <StatCard title="배송 중 사고/지연" value="1 건" color="bg-red-500" />
-        <StatCard title="이번 달 매출" value="₩ 45,000,000" color="bg-purple-500" />
+        <StatCard title="오늘 배차 완료" value="0 건" color="bg-blue-500" />
+        <StatCard title="신규 차주 가입" value="0 명" color="bg-green-500" />
+        <StatCard title="배송 중 사고/지연" value="0 건" color="bg-red-500" />
+        <StatCard title="이번 달 매출" value="₩ 0" color="bg-purple-500" />
       </div>
 
       {/* 2. 최근 목록 영역 */}
