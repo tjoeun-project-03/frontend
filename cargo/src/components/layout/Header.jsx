@@ -9,7 +9,7 @@ const Header = () => {
       {/* 오른쪽: 사용자 정보 & 로그아웃 */}
       <div className="flex items-center gap-4">
         <span className="text-sm text-gray-600">
-          <strong className="text-blue-600">관리자</strong>님 환영합니다
+          <strong className="text-blue-600">{}</strong>님 환영합니다
         </span>
         <button className="px-3 py-1 text-sm text-red-500 border border-red-200 rounded hover:bg-red-50">
           로그아웃
