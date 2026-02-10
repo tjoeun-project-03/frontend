@@ -44,7 +44,7 @@ export const InquiryList = () => {
 
   // 3. 상세 페이지로 이동 함수
   const handleRowClick = (id) => {
-    navigate(`/support/inquiry/${id}`);
+    navigate(`/inquiry/${id}`);
   };
 
   return (

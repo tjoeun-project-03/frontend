@@ -50,7 +50,7 @@ export const InquiryDetail = () => {
     setTimeout(() => {
       alert('답변이 등록되었습니다!');
       setIsSubmitting(false);
-      navigate('/support/reports');
+      navigate('/inquiry');
     }, 1000);
   };
 
@@ -69,8 +69,7 @@ export const InquiryDetail = () => {
         </button>
       </div>
 
-      {/* 🌟 수정 포인트: Grid 제거하고 최대 너비(max-w-4xl) 설정으로 중앙 정렬 */}
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="space-y-6">
         
         {/* 2. 질문 카드 (여기에 상태 뱃지 통합) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
