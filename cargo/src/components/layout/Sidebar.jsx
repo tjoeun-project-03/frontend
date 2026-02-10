@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom'; // NavLink는 현재 페이지 표시할 때 유용함
+import { NavLink, Link } from 'react-router-dom'; // Link 컴포넌트 추가
 
 const Sidebar = () => {
   const menus = [
@@ -28,9 +28,9 @@ const Sidebar = () => {
     {
       name: "고객 지원",
       items: [
-        { name: "신고 심사", path: "/" },
-        { name: "1:1 문의 답변", path: "/support/inquiry"},
-        { name: "공지사항 관리", path: "/support/notice" },
+        { name: "신고 심사", path: "/report" },
+        { name: "1:1 문의 답변", path: "/inquiry"},
+        { name: "공지사항 관리", path: "/notice" },
       ]
     }
   ];
@@ -39,7 +39,9 @@ const Sidebar = () => {
     <div className="w-64 h-screen bg-slate-900 text-white flex flex-col fixed left-0 top-0 overflow-y-auto">
       {/* 1. 로고 영역 */}
       <div className="p-6 text-center border-b border-slate-800">
-        <h1 className="text-2xl font-bold text-blue-400" to={"/"}>화물 관리자</h1>
+        <Link to="/dashboard" className="text-2xl font-bold text-blue-400 block hover:text-blue-300 transition-colors">
+          화물 관리자
+        </Link>
       </div>
 
       {/* 2. 메뉴 영역 */}
