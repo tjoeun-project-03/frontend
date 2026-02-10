@@ -29,7 +29,7 @@ export const NoticeDetail = () => {
   const handleDelete = () => {
     if(window.confirm('정말 이 공지사항을 삭제하시겠습니까?')) {
       alert('삭제되었습니다.');
-      navigate('/support/notice');
+      navigate('/notice');
     }
   };
 
@@ -37,19 +37,18 @@ export const NoticeDetail = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl mx-auto">
-        {/* 1. 상단 네비게이션 */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">공지사항 상세</h2>
-          <button 
-            onClick={() => navigate('/support/notice')} 
-            className="text-gray-500 hover:text-gray-700 font-medium px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            ← 목록으로 돌아가기
-          </button>
-        </div>
+      {/* 1. 상단 네비게이션 */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">공지사항 상세</h2>
+        <button 
+          onClick={() => navigate('/notice')} 
+          className="text-gray-500 hover:text-gray-700 font-medium px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          ← 목록으로 돌아가기
+        </button>
+      </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         
         {/* 2. 게시글 헤더 (제목, 날짜 등) */}
         <div className="p-8 border-b border-gray-100 bg-gray-50/50">
@@ -85,17 +84,15 @@ export const NoticeDetail = () => {
 
         {/* 4. 하단 버튼 영역 (수정/삭제) */}
         <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-        <Button onClick={() => navigate(`/support/notice/write/${notice.id}`)}>
+        <Button onClick={() => navigate(`/notice/write/${notice.id}`)}>
             수정하기
           </Button>
           <button 
             onClick={handleDelete}
-            className="px-4 py-2 rounded-lg border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-colors"
+            className="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-colors whitespace-nowrap"
           >
             삭제하기
           </button>
-        </div>
-
         </div>
       </div>
     </AdminLayout>

@@ -6,6 +6,8 @@ import Button from '../../components/Button';
 export const NoticeList = () => {
   const navigate = useNavigate();
 
+  
+
   const [notices] = useState([
     { 
       id: 10, 
@@ -43,10 +45,11 @@ export const NoticeList = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">공지사항 관리</h2>
-        <p className="text-gray-500 mt-1">사용자 앱에 노출될 공지사항을 등록합니다.</p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">공지사항 관리</h2>
+          <p className="text-gray-500 mt-1">사용자 앱에 노출될 공지사항을 등록합니다.</p>
+        </div>
       </div>
 
       {/* 2. 테이블 영역 */}
@@ -65,7 +68,7 @@ export const NoticeList = () => {
             {notices.map((item) => (
               <tr 
                 key={item.id} 
-                onClick={() => navigate(`/support/notice/${item.id}`)}
+                onClick={() => navigate(`/notice/${item.id}`)}
                 className={`hover:bg-gray-50 cursor-pointer transition-colors ${
                   item.isPinned ? 'bg-red-50/30' : ''
                 }`}
@@ -93,12 +96,11 @@ export const NoticeList = () => {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <Button onClick={() => navigate('/support/notice/write')}>
-          공지 등록
+        <Button onClick={() => navigate('/notice/write')}>
+          공지사항 작성
         </Button>
       </div>
 
-      </div>
     </AdminLayout>
   );
 };

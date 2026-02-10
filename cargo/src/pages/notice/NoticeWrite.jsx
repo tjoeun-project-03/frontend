@@ -1,8 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button';
-import React, { useState, useEffect } from 'react'; // 1. useEffect 추가
-import {useParams } from 'react-router-dom'; // 2. useNavigate, useParams 추가
 
 export const NoticeWrite = () => {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ export const NoticeWrite = () => {
     if (isEditMode) {
       const mockData = {
         id: 10,
-        title: '🚨 [긴급] 서버 점검 안내 (02/12 00:00 ~ 04:00)',
+        title: '[긴급] 서버 점검 안내 (02/12 00:00 ~ 04:00)',
         content: `안녕하세요, 화물 관리자 팀입니다.\n\n안정적인 서비스 제공을 위해...`,
         isPinned: true
       };
