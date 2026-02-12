@@ -1,35 +1,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
+import { getReportList } from '../../api/report';
 
 export const ReportList = () => {
   const navigate = useNavigate();
+  const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // 임시 데이터 (나중엔 API로 가져옴)
-  const [reports] = useState([
-    { 
-      id: 101, 
-      targetUser: '박화물(차주)', // 신고 당한 사람
-      reporter: '김화주(화주)',   // 신고한 사람
-      date: '2026-02-10', 
-      status: 'pending'          // pending: 대기중, done: 처리완료
-    },
-    { 
-      id: 100, 
-      targetUser: '이난폭(차주)', 
-      reporter: '최물류(주선사)', 
-      date: '2026-02-09', 
-      status: 'done',
-      result: 'suspension' // 제재 내용 (정지)
-    },
-    { 
-      id: 99, 
-      targetUser: '김먹튀(주선사)', 
-      reporter: '오트럭(차주)', 
-      date: '2026-02-08', 
-      status: 'pending' 
-    },
-  ]);
+  useState(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getReportList();
+        setReports(Array.isArray(data) ? data : []);
+      } catch(error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  },[])
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  }
 
   return (
     <AdminLayout>
@@ -48,20 +44,20 @@ export const ReportList = () => {
               <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b">접수일</th>
               <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b text-center">상태</th>
             </tr>
-          </thead>
+          </thead> 
           <tbody className="divide-y divide-gray-100">
             {reports.map((item) => (
               <tr 
                 key={item.id} 
-                onClick={() => navigate(`/report/${item.id}`)}
+                onClick={() => navigate(`/report/${item.id}`, { state: item })}
                 className="hover:bg-gray-50 cursor-pointer transition-colors"
               >
                 <td className="p-4 text-gray-600">{item.id}</td>
-                <td className="p-4 text-gray-700 font-medium">{item.targetUser}</td>
-                <td className="p-4 text-gray-500">{item.reporter}</td>
-                <td className="p-4 text-gray-400 text-sm">{item.date}</td>
+                <td className="p-4 text-gray-700 font-medium">{item.reportedUserId}</td>
+                <td className="p-4 text-gray-500">{item.reporterId}</td>
+                <td className="p-4 text-gray-400 text-sm">{formatDate(item.createdAt)}</td>
                 <td className="p-4 text-center">
-                  {item.status === 'pending' ? (
+                  {item.status == 'PENDING' ? (
                     <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full animate-pulse">
                       심사 대기
                     </span>

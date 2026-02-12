@@ -1,35 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button';
+import { reportApprove } from '../../api/report';
 
 export const ReportDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [report, setReport] = useState(null);
+  // const [report, setReport] = useState(null);
+  const report = useLocation().state;
   
   // 심사 결과 관리 (memo: 관리자 메모, penalty: 처벌 수위)
   const [decision, setDecision] = useState({
     memo: '',
-    penalty: 'none' // none, warning, suspension_3d, suspension_permanent
+    penalty: 'none' 
   });
 
   useEffect(() => {
-    // 임시 데이터 (실제로는 API 호출)
-    const mockData = {
-      id: 101,
-      targetUser: '박화물(차주)',
-      targetUserId: 'user_123',
-      reporter: '김화주(화주)',
-      date: '2026-02-10 14:30',
-      content: '상차지인 부산항에 도착했다고 해놓고 1시간 뒤에 전화하니 잠수를 탔습니다.\n다른 차를 구하느라 손해가 막심합니다. 강력한 제재 부탁드립니다.',
-      status: 'pending'
+    const fetchData = async () => {
+      try {
+        // const response = await fetch(`/api/report/${id}`);
+        // const data = await response.json();
+        // setReport(data);
+      } catch (error) { 
+        console.error(error);
+      }
     };
-    setReport(mockData);
+    fetchData();
   }, [id]);
 
   const handleProcess = () => {
     if (window.confirm('이대로 처분을 확정하시겠습니까?')) {
+      reportApprove(id, decision);
       alert(`[처리 완료] 대상자에게 '${decision.penalty}' 처분이 내려졌습니다.`);
       navigate('/report');
     }
@@ -55,9 +57,9 @@ export const ReportDetail = () => {
             </div>
             
             <h3 className="text-xl font-bold text-gray-800 mb-2">
-              신고 대상: <span className="text-red-600 underline">{report.targetUser}</span>
+              신고 대상: <span className="text-red-600 underline">{report.reportedUserId}</span>
             </h3>
-            <p className="text-sm text-gray-500 mb-6">신고자: {report.reporter}</p>
+            <p className="text-sm text-gray-500 mb-6">신고자: {report.reporterId}</p>
 
             <div className="bg-gray-50 p-4 rounded-lg text-gray-700 whitespace-pre-line leading-relaxed">
               {report.content}
@@ -70,7 +72,6 @@ export const ReportDetail = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">심사 및 처분</h3>
 
-            {/* 처분 선택 */}
             <div className="space-y-4 mb-6">
               <label className="block text-sm font-bold text-gray-700">제재 수위 선택</label>
               <select 
@@ -79,9 +80,10 @@ export const ReportDetail = () => {
                 onChange={(e) => setDecision({...decision, penalty: e.target.value})}
               >
                 <option value="none">혐의 없음</option>
-                <option value="suspension_3d">3일 이용 정지</option>
-                <option value="suspension_7d">7일 이용 정지</option>
-                <option value="suspension_permanent">영구 이용 정지</option>
+                <option value="0">경고</option>
+                <option value="3">3일 이용 정지</option>
+                <option value="7">7일 이용 정지</option>
+                <option value="-1">영구 이용 정지</option>
               </select>
             </div>
 
