@@ -2,32 +2,49 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button';
+import { deleteNotice, getNoticeDetail } from '../../api/notice';
 
 export const NoticeDetail = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // url에서 id 가져오기
   const navigate = useNavigate();
+
   const [notice, setNotice] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const mockNotices = [
-      { 
-        id: 10, 
-        title: '[긴급] 서버 점검 안내 (02/12 00:00 ~ 04:00)', 
-        content: `안녕하세요, 화물 관리자 팀입니다.\n\n안정적인 서비스 제공을 위해 아래와 같이 서버 점검이 진행될 예정입니다.\n점검 시간 동안은 서비스 이용이 중단되오니 양해 부탁드립니다.\n\n- 일시: 2026년 2월 12일 00:00 ~ 04:00 (4시간)\n- 대상: 전체 서비스 (PC, 모바일 앱)\n\n감사합니다.`,
-        author: '관리자', 
-        date: '2026-02-09', 
-        views: 0,
-        isPinned: true
-      },
-    ];
+    const fetchDetail = async () => { 
+      try {
+        const data = await getNoticeDetail(id);
+        setNotice(data);
+      } catch(error) {
 
-    const found = mockNotices.find(n => n.id === parseInt(id));
-    setNotice(found);
-  }, [id]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // 삭제 버튼 핸들러
+    if(id) fetchDetail();
+  }, [id, navigate]);
+
+  const getTargetText = (targetCode) => {
+    switch (targetCode) {
+      case 0:
+        return '화주';
+      case 1:
+        return '차주';
+      default:
+        return '전체';
+    }
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleString();
+  };
+
   const handleDelete = () => {
     if(window.confirm('정말 이 공지사항을 삭제하시겠습니까?')) {
+      deleteNotice(id);
       alert('삭제되었습니다.');
       navigate('/notice');
     }
@@ -53,24 +70,33 @@ export const NoticeDetail = () => {
         {/* 2. 게시글 헤더 (제목, 날짜 등) */}
         <div className="p-8 border-b border-gray-100 bg-gray-50/50">
           <div className="flex items-center gap-2 mb-3">
-            {notice.isPinned && (
+            
+            {/* 1. [필독] 뱃지 (기존 코드) */}
+            {notice.pinned ? (
               <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded">
                 필독
-              </span>
-            )}
-            <span className="text-sm text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded">
-              공지
+              </span> 
+            ): ''}
+
+            <span className={`px-2 py-1 text-xs font-bold rounded ${
+              notice.target == 1 
+                ? 'bg-blue-100 text-blue-700'   // 1: 화주 (파랑)
+                : notice.target == 0 
+                ? 'bg-green-100 text-green-700' // 0: 차주 (초록)
+                : 'bg-gray-200 text-gray-600'   // 그외: 전체 (회색)
+            }`}>
+              {getTargetText(notice.target)}
             </span>
           </div>
 
           <h3 className="text-2xl font-bold text-gray-900 mb-4">{notice.title}</h3>
 
           <div className="flex items-center text-sm text-gray-500 space-x-4">
-            <span>작성자: <b className="text-gray-700">{notice.author}</b></span>
+            <span>작성자: <b className="text-gray-700">{notice.writerName}</b></span>
             <span className="w-px h-3 bg-gray-300"></span>
-            <span>등록일: {notice.date}</span>
+            <span>등록일: {formatDate(notice.createdAt)}</span>
             <span className="w-px h-3 bg-gray-300"></span>
-            <span>조회수: {notice.views}</span>
+            <span>조회수: {notice.viewCount}</span>
           </div>
         </div>
 
@@ -84,12 +110,18 @@ export const NoticeDetail = () => {
 
         {/* 4. 하단 버튼 영역 (수정/삭제) */}
         <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/30">
-        <Button onClick={() => navigate(`/notice/write/${notice.id}`)}>
+        <Button onClick={() => navigate(`/notice/write/${notice.id}`, {
+          state: notice, // 보낼 때 형식은 이렇게 해야 되는건가? 원래 이렇게 했나?
+        })}>
             수정하기
           </Button>
           <button 
             onClick={handleDelete}
-            className="px-6 py-2.5 rounded-lg border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-colors whitespace-nowrap"
+            className="
+              h-11 px-6 rounded-lg border border-red-200    
+              flex items-center justify-center           
+              text-red-600 font-medium 
+              hover:bg-red-50 transition-colors whitespace-nowrap"
           >
             삭제하기
           </button>

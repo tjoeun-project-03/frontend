@@ -1,47 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button'; 
+import { getNoticeList } from '../../api/notice';
 
 export const NoticeList = () => {
   const navigate = useNavigate();
-
   
+  const [notices, setNotices] = useState([]); // 초기값 (빈 배열)
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 (선택사항) 
 
-  const [notices] = useState([
-    { 
-      id: 10, 
-      title: '[긴급] 서버 점검 안내 (02/12 00:00 ~ 04:00)', 
-      author: '관리자', 
-      date: '2026-02-09', 
-      views: 0,
-      isPinned: true
-    },
-    { 
-      id: 9, 
-      title: '설 연휴 정산 일정 변경 안내', 
-      author: '운영팀', 
-      date: '2026-02-01', 
-      views: 0,
-      isPinned: true 
-    },
-    { 
-      id: 8, 
-      title: '2월 유류비 지원 정책 변경사항', 
-      author: '관리자', 
-      date: '2026-01-28', 
-      views: 0,
-      isPinned: false
-    },
-    { 
-      id: 7, 
-      title: '앱 업데이트 안내 (v2.1.0)', 
-      author: '개발팀', 
-      date: '2026-01-20', 
-      views: 0,
-      isPinned: false
-    },
-  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getNoticeList();
+        setNotices(Array.isArray(data) ? data : []);
+      } catch(error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const getTargetText = (targetCode) => {
+    switch (targetCode) {
+      case 0:
+        return '화주';
+      case 1:
+        return '차주';
+      default:
+        return '전체';
+    }
+  }
+
+  // 날짜 변환 함수
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  }
 
   return (
     <AdminLayout>
@@ -54,45 +52,59 @@ export const NoticeList = () => {
 
       {/* 2. 테이블 영역 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        {isLoading ? (
+          <div className="p-10 text-center text-gray-500">데이터를 불러오는 중...</div>
+        ) : (
+          <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-16">번호</th>
-              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">제목</th>
-              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-32">작성자</th>
-              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-32">등록일</th>
-              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-24">조회수</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">번호</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">대상자</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-1/2">제목</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">작성자</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">등록일</th>
+              <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">조회수</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {notices.map((item) => (
-              <tr 
-                key={item.id} 
-                onClick={() => navigate(`/notice/${item.id}`)}
-                className={`hover:bg-gray-50 cursor-pointer transition-colors ${
-                  item.isPinned ? 'bg-red-50/30' : ''
-                }`}
-              >
-                <td className="p-4 text-gray-600">
-                  {item.id}
-                </td>
-                <td className="p-4">
-                  {item.isPinned && (
-                    <span className="inline-block px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded mr-2 align-middle">
-                      필독
-                    </span>
-                  )}
-                  <span className={`align-middle ${item.isPinned ? 'font-bold text-gray-800' : 'text-gray-600'}`}>
-                    {item.title}
-                  </span>
-                </td>
-                <td className="p-4 text-gray-500 text-sm">{item.author}</td>
-                <td className="p-4 text-gray-500 text-sm">{item.date}</td>
-                <td className="p-4 text-gray-400 text-sm">{item.views}</td>
-              </tr>
-            ))}
+              {notices.length === 0 ? (
+                /* 데이터 없을 때 */
+                <tr>
+                  <td colSpan="6" className="p-10 text-center text-gray-500">
+                    등록된 공지사항이 없습니다.
+                  </td>
+                </tr>
+              ) : ( 
+                /* 데이터 있을 때 (기존 맵핑 코드) */
+                notices.map((item) => (
+                  
+                  <tr 
+                    key={item.id} 
+                    onClick={() => navigate(`/notice/${item.id}`)}
+                    className={`hover:bg-gray-50 cursor-pointer transition-colors ${
+                      item.pinned ? 'bg-red-50/50' : ''
+                    }`}
+                  >
+                    <td className="p-4 text-gray-600">
+                      {item.pinned ? (
+                        <span className="inline-block px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded">
+                          필독
+                        </span>
+                      ) : (
+                        item.id
+                      )}
+                    </td>
+                    <td className="p-4 font-medium">{getTargetText(item.target)}</td>
+                    <td className="p-4 text-gray-800 font-medium truncate max-w-xs">{item.title}</td>
+                    <td className="p-4 text-gray-600">{item.writerName}</td>
+                    <td className="p-4 text-gray-500 text-sm">{formatDate(item.createdAt)}</td>
+                    <td className="p-4 text-gray-600">{item.viewCount}</td>
+                  </tr>
+                ))
+              )}
           </tbody>
         </table>
+        )}
       </div>
 
       <div className="mt-6 flex justify-end">
