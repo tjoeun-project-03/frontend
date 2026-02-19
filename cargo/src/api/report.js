@@ -12,7 +12,7 @@ export const getReportList = async () => {
 
 export const reportApprove = async (id, data) => {
   const token = localStorage.getItem('token');
-  const response = await axios.post(`http://localhost:8080/api/admin/reports/${id}/approve`,{
+  const response = await axios.patch(`http://localhost:8080/api/admin/reports/${id}/approve`,{
       penaltyDays: data.penalty,
       adminComment: data.memo
     },{
