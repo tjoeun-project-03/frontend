@@ -4,24 +4,28 @@ import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button';
 import { reportApprove } from '../../api/report';
 
+const penaltyChange = (penaltyValue) => {
+  if (penaltyValue === 'NONE') return '9999';
+  if (penaltyValue === 'WARNING') return '0';
+  if (penaltyValue === 'SUSPENSION_3') return '3';
+  if (penaltyValue === 'SUSPENSION_7') return '7';
+  if (penaltyValue === 'PERMANENT_BAN') return '-1';
+}
+
 export const ReportDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const [report, setReport] = useState(null);
   const report = useLocation().state;
-  
-  // 심사 결과 관리 (memo: 관리자 메모, penalty: 처벌 수위)
+  const isProcessed = report?.status === 'PROCESSED';
   const [decision, setDecision] = useState({
-    memo: '',
-    penalty: 'none' 
+    memo: report?.adminComment || '',
+    penalty: penaltyChange(report?.penalty) 
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const response = await fetch(`/api/report/${id}`);
-        // const data = await response.json();
-        // setReport(data);
+
       } catch (error) { 
         console.error(error);
       }
@@ -29,11 +33,16 @@ export const ReportDetail = () => {
     fetchData();
   }, [id]);
 
-  const handleProcess = () => {
-    if (window.confirm('이대로 처분을 확정하시겠습니까?')) {
-      reportApprove(id, decision);
-      alert(`[처리 완료] 대상자에게 '${decision.penalty}' 처분이 내려졌습니다.`);
-      navigate('/report');
+  const handleProcess = async () => {
+    const confirmMessage = isProcessed ? '수정하시겠습니까?' : '확정하시겠습니까?';
+    if (window.confirm(confirmMessage)) {
+      try {
+        await reportApprove(id, decision);
+        alert(`완료`);
+        navigate('/report');
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -79,7 +88,7 @@ export const ReportDetail = () => {
                 value={decision.penalty}
                 onChange={(e) => setDecision({...decision, penalty: e.target.value})}
               >
-                <option value="none">혐의 없음</option>
+                <option value="9999">혐의 없음</option>
                 <option value="0">경고</option>
                 <option value="3">3일 이용 정지</option>
                 <option value="7">7일 이용 정지</option>
