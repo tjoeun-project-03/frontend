@@ -70,11 +70,9 @@ export const SanctionList = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-16">번호</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-24">구분</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-32">이름 (이메일)</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-24">제재 상태</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-48">정지 해제 일시</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b">제재 사유(관리자 메모)</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-32">이름</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-64">정지 해제 일시</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b">제재 사유</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b text-center w-24">관리</th>
               </tr>
             </thead>
@@ -90,20 +88,13 @@ export const SanctionList = () => {
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 text-gray-600 font-medium">{user.id}</td>
                     <td className="p-4">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded">
-                        {user.userType}
-                      </span>
+                      <p className="text-gray-900 font-bold">{user.reportedUserName}</p>
                     </td>
-                    <td className="p-4">
-                      <p className="text-gray-900 font-bold">{user.name}</p>
-                      <p className="text-gray-500 text-xs">{user.email}</p>
-                    </td>
-                    <td className="p-4">{getSanctionBadge(user.banUntil)}</td>
                     <td className="p-4 text-gray-700 font-medium text-sm">
                       {formatBanDate(user.banUntil)}
                     </td>
-                    <td className="p-4 text-gray-600 text-sm truncate max-w-xs" title={user.reason}>
-                      {user.reason}
+                    <td className="p-4 text-gray-600 text-sm truncate max-w-xs" title={user.penalty}>
+                      {user.penalty}
                     </td>
                     <td className="p-4 text-center">
                       <button 
