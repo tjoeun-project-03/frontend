@@ -7,7 +7,7 @@ const Sidebar = () => {
       name: "운송 관제",
       items: [
         { name: "실시간 모니터링", path: "/" },
-        { name: "할증/수수료 설정", path: "/" },
+        { name: "할증/수수료 설정", path: "/surcharge/manage" },
         { name: "배차 강제 취소", path: "/" },
       ]
     },
