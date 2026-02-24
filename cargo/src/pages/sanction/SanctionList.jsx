@@ -14,6 +14,7 @@ export const SanctionList = () => {
     setIsLoading(true);
     try {
       const data = await getSanctionedUsers();
+      console.log(data);
       setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("제재 유저 목록 로딩 실패:", error);
@@ -77,9 +78,11 @@ export const SanctionList = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
+              
+              {/* 3. 컬럼 개수가 줄었으므로 colSpan을 7에서 6으로 변경 */}
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="p-10 text-center text-gray-500">
+                  <td colSpan="6" className="p-10 text-center text-gray-500">
                     현재 제재 중인 유저가 없습니다.
                   </td>
                 </tr>
