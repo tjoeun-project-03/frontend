@@ -6,7 +6,7 @@ const Sidebar = () => {
     {
       name: "운송 관제",
       items: [
-        { name: "실시간 모니터링", path: "/monitoring/RealTimeMonitoring" },
+        { name: "실시간 모니터링", path: "/monitoring" },
         { name: "할증/수수료 설정", path: "/surcharge/manage" },
       ]
     },
@@ -15,13 +15,14 @@ const Sidebar = () => {
       items: [
         { name: "차주 신청", path: "/driver/request" },
         { name: "사용자 제재", path: "/sanction/list" },
+        { name: "유저 조회", path: "/user/list" },
       ]
     },
     {
       name: "재무/정산",
       items: [
         { name: "매출 통계", path: "/" },
-        { name: "차주 정산 승인", path: "/" },
+        { name: "차주 정산 승인", path: "/settlement" },
       ]
     },
     {

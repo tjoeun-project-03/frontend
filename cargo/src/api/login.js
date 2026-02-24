@@ -16,3 +16,12 @@ export const getUserInfo = async (token) => {
   })
   return result.data;
 };
+
+export const getUser = async () => {
+  const result = await axios.get('http://localhost:8080/api/users', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+  })
+  return result.data;
+};

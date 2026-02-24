@@ -13,6 +13,8 @@ import { DriverRequestList } from '../pages/driver/DriverRequestList';
 import { SanctionList } from '../pages/sanction/SanctionList';
 import { SurchargeManage } from '../pages/surcharge/Surcharge';
 import { RealTimeMonitoring } from '../pages/monitoring/RealTimeMonitoring';
+import { SettlementManage } from '../pages/settlement/Settlement';
+import { UserManagement } from '../pages/user/User';
 
 export const AppRoutes = () => {
   return (
@@ -30,7 +32,9 @@ export const AppRoutes = () => {
       <Route path="/driver/request" element={<DriverRequestList/>}/>{/* 차주 신청 리스트 */}
       <Route path="/sanction/list" element={<SanctionList/>}/>{/* 제재 리스트 */}
       <Route path="/surcharge/manage" element={<SurchargeManage/>}/>{/* 수수료 및 할증 관리 */}
-      <Route path="/monitoring/RealTimeMonitoring" element={<RealTimeMonitoring/>}/>{/* 실시간 배송 모니터링 */}
+      <Route path="/monitoring" element={<RealTimeMonitoring/>}/>{/* 실시간 배송 모니터링 */}
+      <Route path="/settlement" element={<SettlementManage/>}/>{/* 정산 승인 관리 */}
+      <Route path="/user/list" element={<UserManagement/>}/>{/* 회원 관리 */}
     </Routes>
   );
 };
