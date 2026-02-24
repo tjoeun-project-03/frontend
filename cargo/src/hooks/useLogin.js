@@ -28,10 +28,10 @@ export const useLogin = () => {
       // API 호출
       const result = await loginUser(formData.id, formData.password);
       if(result) {
-        localStorage.setItem('token', result);
+        localStorage.setItem('token', result.accessToken);
       }
-      const userData = await getUserInfo(result);
-      localStorage.setItem('user', JSON.stringify(userData)); 
+      const userData = await getUserInfo(result.accessToken);
+      localStorage.setItem('user', JSON.stringify(userData));
       alert('로그인 되었습니다');
       return true;
     } catch (err) {

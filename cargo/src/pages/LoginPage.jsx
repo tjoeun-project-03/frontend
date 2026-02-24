@@ -7,21 +7,17 @@ import { useLogin } from '../hooks/useLogin';
 export const LoginPage = () => {
   const navigate = useNavigate();
 
-  // 2. 훅을 실행해서 필요한 것들만 쏙 빼옵니다.
   const { 
     formData, 
     error, 
     isLoading, 
     handleChange, 
-    handleSubmit // 훅 안에 있는 handleSubmit을 가져옴
+    handleSubmit 
   } = useLogin();
 
-  // 3. 페이지 전용: "로그인 성공 후 이동"만 담당하는 함수
   const onLoginProcess = async (e) => {
-    // 훅에 있는 handleSubmit을 실행하고 결과를 기다림
     const isSuccess = await handleSubmit(e);
     
-    // 훅이 "true(성공)"를 줬을 때만 이동
     if (isSuccess) {
       navigate('/dashboard');
     }
