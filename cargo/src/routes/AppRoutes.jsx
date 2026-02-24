@@ -35,6 +35,7 @@ export const AppRoutes = () => {
       <Route path="/monitoring" element={<RealTimeMonitoring/>}/>{/* 실시간 배송 모니터링 */}
       <Route path="/settlement" element={<SettlementManage/>}/>{/* 정산 승인 관리 */}
       <Route path="/user/list" element={<UserManagement/>}/>{/* 회원 관리 */}
+      <Route path="/user/reportList" element={<UserManagement/>}/>{/* 회원 신고 리스트 */}
     </Routes>
   );
 };

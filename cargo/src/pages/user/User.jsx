@@ -1,28 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import { getUser } from './../../api/login';
-
+import { useNavigate } from 'react-router-dom';
 
 export const UserManagement = () => {
   const [activeTab, setActiveTab] = useState('carrier');
-  const shippers = [
-    { userId: 'dbsdbfla', userName: '남꿍화주', companyName: '(주)짐라인운송', phone: '010-1111-2222', corpReg: '123-45-67890' }
-  ];
-  
-  const carriers = [
-    { userId: 'skarnddydwls1', userName: '남꿍차주', car: '현대 포터', carType: '1톤 카고', carNum: '12가3456', phone: '010-9999-8888', isApproved: true }
-  ];
+  const [allUsers, setAllUsers] = useState([]); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
-        try{
-            const users = await getUser();
+      try {
+        const users = await getUser();
+        console.log("가져온 유저 데이터:", users);
+        setAllUsers(users); // 가져온 데이터를 state에 저장!
+      } catch (error) {
+        console.error("유저 정보를 가져오는데 실패했습니다.", error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
-        }catch(error){
+  // 💡 탭 상태에 따라 데이터를 분류합니다. (렌더링 할 때마다 알아서 필터링 됨)
+  const displayUsers = allUsers.filter(user => {
+    // 대소문자 구분 없이 처리하기 위해 toUpperCase() 사용 (안전빵)
+    if (activeTab === 'carrier') return user.role?.toUpperCase() === 'CARRIER';
+    if (activeTab === 'shipper') return user.role?.toUpperCase() === 'SHIPPER';
+    return false;
+  });
 
-        }
-    }
-  },[])
+  // 날짜 포맷팅 함수 (년-월-일)
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString();
+  };
 
   return (
     <AdminLayout>
@@ -31,7 +42,7 @@ export const UserManagement = () => {
         <p className="text-gray-500 text-sm mt-1">플랫폼에 가입한 화주 및 차주 회원을 관리합니다.</p>
       </div>
 
-      {/* 💡 탭(Tab) 버튼 영역 */}
+      {/* 탭(Tab) 버튼 영역 */}
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6 w-fit">
         <button
           onClick={() => setActiveTab('carrier')}
@@ -51,66 +62,50 @@ export const UserManagement = () => {
         </button>
       </div>
 
-      {/* 💡 탭에 따라 다른 테이블 렌더링 */}
+      {/* 테이블 영역 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
             <tr>
-              {/* 공통 열 */}
               <th className="p-4 font-bold w-1/5">아이디 / 이름</th>
               <th className="p-4 font-bold w-1/5">연락처</th>
+              <th className="p-4 font-bold w-1/5">이메일</th>
+              <th className="p-4 font-bold w-1/5">가입일</th>
               
-              {/* 조건부 열: 차주일 때와 화주일 때 다르게 보여줌! */}
-              {activeTab === 'carrier' ? (
-                <>
-                  <th className="p-4 font-bold w-1/4">차량 정보 (차종/번호)</th>
-                  <th className="p-4 font-bold w-1/5">서류 승인 상태</th>
-                </>
-              ) : (
-                <>
-                  <th className="p-4 font-bold w-1/4">회사명</th>
-                  <th className="p-4 font-bold w-1/5">사업자등록번호</th>
-                </>
-              )}
-              <th className="p-4 font-bold text-center w-[15%]">관리</th>
+              <th className="p-4 font-bold text-center w-[15%]">제재 내역 조회</th>
             </tr>
           </thead>
           
           <tbody className="divide-y divide-gray-200">
-            {activeTab === 'carrier' && carriers.map((user) => (
+            {/* 💡 필터링된 displayUsers 배열을 map으로 돌립니다. */}
+            {displayUsers.map((user) => (
               <tr key={user.userId} className="hover:bg-gray-50">
                 <td className="p-4">
                   <div className="font-semibold text-gray-800">{user.userId}</div>
                   <div className="text-xs text-gray-500">{user.userName}</div>
                 </td>
                 <td className="p-4 text-sm">{user.phone}</td>
-                <td className="p-4">
-                  <span className="font-medium text-blue-600">{user.carType}</span>
-                  <span className="text-sm text-gray-600 ml-2">({user.carNum})</span>
-                </td>
-                <td className="p-4">
-                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">승인 완료</span>
-                </td>
+                <td className="p-4 text-sm">{user.email}</td>
+                <td className="p-4 text-sm">{formatDate(user.createdAt)}</td>
                 <td className="p-4 text-center">
-                  <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">상세</button>
+                    <button 
+                    className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50" 
+                    onClick={() => navigate("/user/reportList")}
+                    >
+                    상세
+                    </button>
                 </td>
               </tr>
             ))}
 
-            {activeTab === 'shipper' && shippers.map((user) => (
-              <tr key={user.userId} className="hover:bg-gray-50">
-                <td className="p-4">
-                  <div className="font-semibold text-gray-800">{user.userId}</div>
-                  <div className="text-xs text-gray-500">{user.userName}</div>
-                </td>
-                <td className="p-4 text-sm">{user.phone}</td>
-                <td className="p-4 font-medium text-gray-800">{user.companyName}</td>
-                <td className="p-4 text-sm text-gray-500">{user.corpReg}</td>
-                <td className="p-4 text-center">
-                  <button className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50">상세</button>
+            {/* 유저가 없을 경우 예외 처리 */}
+            {displayUsers.length === 0 && (
+              <tr>
+                <td colSpan="5" className="p-8 text-center text-gray-500">
+                  조회된 {activeTab === 'carrier' ? '차주' : '화주'} 회원이 없습니다.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

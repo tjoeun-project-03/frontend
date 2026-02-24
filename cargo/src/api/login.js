@@ -17,7 +17,9 @@ export const getUserInfo = async (token) => {
   return result.data;
 };
 
+// 전체 유저 조회
 export const getUser = async () => {
+  const token = localStorage.getItem('token');
   const result = await axios.get('http://localhost:8080/api/users', {
     headers: {
       Authorization: `Bearer ${token}`
@@ -25,3 +27,14 @@ export const getUser = async () => {
   })
   return result.data;
 };
+
+// 유저 제재 리스트
+export const getReportUser = async (id) => {
+  const token = localStorage.getItem('token');
+  const result = await axios.get('', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+  })
+  return result.data;
+}
