@@ -15,6 +15,7 @@ import { SurchargeManage } from '../pages/surcharge/Surcharge';
 import { RealTimeMonitoring } from '../pages/monitoring/RealTimeMonitoring';
 import { SettlementManage } from '../pages/settlement/Settlement';
 import { UserManagement } from '../pages/user/User';
+import { UserReportList } from '../pages/user/UserReportList';
 
 export const AppRoutes = () => {
   return (
@@ -35,7 +36,7 @@ export const AppRoutes = () => {
       <Route path="/monitoring" element={<RealTimeMonitoring/>}/>{/* 실시간 배송 모니터링 */}
       <Route path="/settlement" element={<SettlementManage/>}/>{/* 정산 승인 관리 */}
       <Route path="/user/list" element={<UserManagement/>}/>{/* 회원 관리 */}
-      <Route path="/user/reportList" element={<UserManagement/>}/>{/* 회원 신고 리스트 */}
+      <Route path="/user/reportUser/:id" element={<UserReportList/>}/>{/* 회원 신고 리스트 */}
     </Routes>
   );
 };

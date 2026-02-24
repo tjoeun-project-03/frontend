@@ -31,7 +31,7 @@ export const getUser = async () => {
 // 유저 제재 리스트
 export const getReportUser = async (id) => {
   const token = localStorage.getItem('token');
-  const result = await axios.get('', {
+  const result = await axios.get(`http://localhost:8080/api/admin/users/${id}/sanctions`, {
     headers: {
       Authorization: `Bearer ${token}`
     },

@@ -12,8 +12,7 @@ export const UserManagement = () => {
     const fetchUsers = async () => {
       try {
         const users = await getUser();
-        console.log("가져온 유저 데이터:", users);
-        setAllUsers(users); // 가져온 데이터를 state에 저장!
+        setAllUsers(users);
       } catch (error) {
         console.error("유저 정보를 가져오는데 실패했습니다.", error);
       }
@@ -90,7 +89,7 @@ export const UserManagement = () => {
                 <td className="p-4 text-center">
                     <button 
                     className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50" 
-                    onClick={() => navigate("/user/reportList")}
+                    onClick={() => navigate(`/user/reportUser/${user.userId}`)}
                     >
                     상세
                     </button>
