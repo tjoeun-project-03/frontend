@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import Button from '../../components/Button';
+import { useNavigate } from 'react-router-dom';
+import { setSurcharge, getSurcharge } from '../../api/surcharge';
 
 export const SurchargeManage = () => {
+  const navigate = useNavigate();
   const [pricing, setPricing] = useState({
     baseFee: 0,
     weatherRule: 0,
@@ -20,16 +23,29 @@ export const SurchargeManage = () => {
 
   const handleSave = async () => {
     if (window.confirm('수수료 및 할증 정책을 저장하시겠습니까?')) {
-      console.log('서버로 보낼 데이터:', pricing);
-      alert('저장되었습니다!');
+      try {setPricing
+        await setSurcharge(pricing);
+        alert('저장되었습니다.');
+        navigate('/dashboard');
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
-
-  // 💡 할증률 합계 계산 로직 (날씨 + 심야 + 휴일)
   const totalSurcharge = pricing.weatherRule + pricing.nightRule + pricing.holidayRule;
-  // 예시 운임 (10만 원 기준)
-  const exampleBaseFare = 100000;
-  const exampleSurchargeAmount = exampleBaseFare * (totalSurcharge / 100);
+
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const pricing = await getSurcharge(); 
+        setPricing(pricing);
+      } catch (error) {
+        console.error('수수료 데이터를 불러오는 중 에러 발생:', error);
+      }
+    };
+  
+    fetchPricing();
+  }, []);
 
   return (
     <AdminLayout>
@@ -37,14 +53,14 @@ export const SurchargeManage = () => {
         <h2 className="text-2xl font-bold text-gray-800">수수료 및 할증 관리</h2>
       </div>
 
-      <div className="space-y-6 max-w-4xl">
+      <div className="space-y-6 w-full">
         
         {/* 1. 기본 수수료 설정 */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">기본 수수료 설정</h3>
           <div className="flex items-center space-x-4">
             <label className="w-32 text-sm font-bold text-gray-700">플랫폼 수수료</label>
-            <div className="relative flex-1 max-w-xs">
+            <div className="relative flex-1">
               <input 
                 type="number" name="baseFee" value={pricing.baseFee} onChange={handleChange}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right pr-8"
@@ -63,7 +79,7 @@ export const SurchargeManage = () => {
             {/* 날씨 할증 */}
             <div className="flex items-center space-x-4">
               <label className="w-32 text-sm font-bold text-gray-700">날씨 할증</label>
-              <div className="relative flex-1 max-w-xs">
+              <div className="relative flex-1">
                 <input type="number" name="weatherRule" value={pricing.weatherRule} onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right pr-8" />
                 <span className="absolute right-3 top-3 text-gray-500">%</span>
@@ -73,7 +89,7 @@ export const SurchargeManage = () => {
             {/* 심야 할증 */}
             <div className="flex items-center space-x-4">
               <label className="w-32 text-sm font-bold text-gray-700">심야 할증</label>
-              <div className="relative flex-1 max-w-xs">
+              <div className="relative flex-1">
                 <input type="number" name="nightRule" value={pricing.nightRule} onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right pr-8" />
                 <span className="absolute right-3 top-3 text-gray-500">%</span>
@@ -83,7 +99,7 @@ export const SurchargeManage = () => {
             {/* 휴일 할증 */}
             <div className="flex items-center space-x-4">
               <label className="w-32 text-sm font-bold text-gray-700">휴일 할증</label>
-              <div className="relative flex-1 max-w-xs">
+              <div className="relative flex-1">
                 <input type="number" name="holidayRule" value={pricing.holidayRule} onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right pr-8" />
                 <span className="absolute right-3 top-3 text-gray-500">%</span>
@@ -97,11 +113,6 @@ export const SurchargeManage = () => {
               <span className="text-sm font-bold text-blue-800">최대 적용 가능 할증률 (합계)</span>
               <span className="text-2xl font-extrabold text-blue-600">{totalSurcharge}%</span>
             </div>
-            <p className="text-sm text-blue-600/80 mt-2">
-              비 오는 빨간날 새벽에 배차될 경우, 모든 할증이 중복 적용되어 기본 운임에 <strong className="text-blue-700">최대 {totalSurcharge}%</strong>가 추가됩니다.
-              <br/>
-              (예시: 기본 운임 100,000원 ➔ 할증 <strong className="text-blue-700">{exampleSurchargeAmount.toLocaleString()}원</strong> 추가)
-            </p>
           </div>
 
         </div>
