@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/layout/AdminLayout';
-import Button from '../../components/Button';
+// import Button from '../../components/Button'; // 기존에 쓰시던 버튼 컴포넌트가 있다면 유지
+import { useNavigate } from 'react-router-dom'; // 💡 페이지 이동을 위한 훅 임포트!
 
 export const RealTimeMonitoring = () => {
+  const navigate = useNavigate(); // 💡 선언해 줍니다.
+
   // 💡 더미 데이터: 실제로는 백엔드에서 status가 'BEFORE_DELIVERY', 'DELIVERING'인 것만 가져옵니다.
   const [activeOrders, setActiveOrders] = useState([
     {
@@ -45,7 +48,7 @@ export const RealTimeMonitoring = () => {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">실시간 배송 모니터링</h2>
+          <h2 className="text-2xl font-bold text-gray-800">실시간 배송 모니터링 🛰️</h2>
           <p className="text-gray-500 text-sm mt-1">현재 배차 완료 및 배송 중인 화물 목록입니다.</p>
         </div>
         <div className="flex space-x-2">
@@ -65,8 +68,7 @@ export const RealTimeMonitoring = () => {
                 <th className="p-4 font-bold">상태</th>
                 <th className="p-4 font-bold">화주 / 차주 정보</th>
                 <th className="p-4 font-bold">경로 (출발 ➔ 도착)</th>
-                <th className="p-4 font-bold">실시간 위치</th>
-                <th className="p-4 font-bold">관리</th> {/* 우측 끝 정렬 */}
+                <th className="p-4 font-bold text-center">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -107,27 +109,33 @@ export const RealTimeMonitoring = () => {
                     </div>
                   </td>
 
-                  {/* 5. 실시간 위치 */}
-                  <td className="p-4">
-                    <div className="text-sm font-medium text-gray-800">{order.currentLocation}</div>
-                  </td>
+                  {/* 6. 관리 버튼 영역 (상세보기 추가!) - 세로 배치로 변경 */}
+                  <td className="p-4 text-center">
+                    <div className="flex flex-col items-center space-y-2">
+                      
+                      {/* 💡 새로운 버튼: 클릭 시 /monitoring/detail/주문번호 로 이동합니다. */}
+                      <button 
+                        onClick={() => navigate(`/monitoring/detail/${order.id}`)}
+                        className="px-4 py-2 rounded-lg text-sm font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                      >
+                        지도/상세
+                      </button>
 
-                  {/* 6. 관리 버튼 (배차 취소) */}
-                  <td className="p-4 text-right">
-                    <button 
-                      onClick={() => handleCancelDispatch(order.id, order.status)}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${'bg-red-50 text-red-600 hover:bg-red-100' }`}
-                    >
-                      배차 취소
-                    </button>
+                      {/* 기존 배차 취소 버튼 */}
+                      <button 
+                        onClick={() => handleCancelDispatch(order.id, order.status)}
+                        className="px-4 py-2 rounded-lg text-sm font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                      >
+                        배차 취소
+                      </button>
+                    </div>
                   </td>
-
                 </tr>
               ))}
               
               {activeOrders.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="p-8 text-center text-gray-500">
+                  <td colSpan="5" className="p-8 text-center text-gray-500">
                     현재 진행 중인 배송 건이 없습니다.
                   </td>
                 </tr>
