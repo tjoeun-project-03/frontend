@@ -26,7 +26,6 @@ export const UserReportList = () => {
     fetchSanctionHistory();
   }, [id]);
 
-  // 제재 타입을 한글로 예쁘게 바꿔주는 헬퍼 함수
   const translatePenalty = (penalty) => {
     switch (penalty) {
       case 'WARNING': return <span className="text-amber-600 font-bold">경고</span>;
