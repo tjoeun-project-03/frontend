@@ -16,6 +16,8 @@ import { RealTimeMonitoring } from '../pages/monitoring/RealTimeMonitoring';
 import { SettlementManage } from '../pages/settlement/Settlement';
 import { UserManagement } from '../pages/user/User';
 import { UserReportList } from '../pages/user/UserReportList';
+import { RevenueManage } from '../pages/revenue/Revenue';
+import {MonitoringDetail} from '../pages/monitoring/MonitoringDetail';
 
 export const AppRoutes = () => {
   return (
@@ -37,6 +39,8 @@ export const AppRoutes = () => {
       <Route path="/settlement" element={<SettlementManage/>}/>{/* 정산 승인 관리 */}
       <Route path="/user/list" element={<UserManagement/>}/>{/* 회원 관리 */}
       <Route path="/user/reportUser/:id" element={<UserReportList/>}/>{/* 회원 신고 리스트 */}
+      <Route path="/revenue" element={<RevenueManage/>}/>{/* 매출 동계 */}
+      <Route path="/monitoring/detail/:id" element={<MonitoringDetail />} /> {/* 배송 상세 관제 */}
     </Routes>
   );
 };
