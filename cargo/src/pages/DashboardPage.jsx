@@ -29,10 +29,9 @@ export const DashboardPage = () => {
 
       {/* 1. 실무형 요약 카드 영역 (To-Do & 알림 위주) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {/* onClick 이벤트를 달아서 누르면 바로 해당 메뉴로 이동하게 하면 아주 편합니다! */}
         <StatCard title="정산 대기 (미승인)" value="0 건" color="bg-blue-500" textColor="text-blue-600" onClick={() => navigate('/settlement')} />
         <StatCard title="미처리 신고 접수" value="0 건" color="bg-red-500" textColor="text-red-600" onClick={() => navigate('/report')} />
-        <StatCard title="배차 지연 (30분 초과)" value="0 건" color="bg-amber-500" textColor="text-amber-600" />
+        <StatCard title="배차 지연 (30분 초과)" value="0 건" color="bg-amber-500" textColor="text-amber-600" onClick={() => {}} />
         <StatCard title="현재 실시간 배송 중" value="0 건" color="bg-green-500" textColor="text-green-600" onClick={() => navigate('/monitoring')} />
       </div>
 
@@ -65,7 +64,7 @@ export const DashboardPage = () => {
           <div className="space-y-4 flex-1">
             {/* 기본 수수료 */}
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <span className="text-sm font-bold text-gray-700">플랫폼 기본 수수료</span>
+              <span className="text-sm font-bold text-gray-700">수수료</span>
               <span className="text-lg font-extrabold text-blue-600">{currentPricing.baseFee}%</span>
             </div>
 
