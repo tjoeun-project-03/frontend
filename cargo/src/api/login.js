@@ -8,6 +8,18 @@ export const loginUser = async (id, password) => {
   return response.data;
 };
 
+export const logoutUser = async () => {
+  const token = localStorage.getItem('token');
+  if(!token) return;
+
+  const response = await axios.post('http://localhost:8080/api/auth/logout', {}, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+  });
+  return response.data;
+};
+
 export const getUserInfo = async (token) => {
   const result = await axios.get('http://localhost:8080/api/users/me', {
     headers: {

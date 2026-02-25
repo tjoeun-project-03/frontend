@@ -1,7 +1,11 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom'; // Link 컴포넌트 추가
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../api/login';
+
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const menus = [
     {
       name: "운송 관제",
@@ -21,7 +25,7 @@ const Sidebar = () => {
     {
       name: "재무/정산",
       items: [
-        { name: "매출 통계", path: "/" },
+        { name: "매출 통계", path: "/revenue" },
         { name: "차주 정산 승인", path: "/settlement" },
       ]
     },
@@ -34,6 +38,20 @@ const Sidebar = () => {
       ]
     }
   ];
+
+  const handleLogout = async () => {
+    if (!window.confirm("로그아웃 하시겠습니까?")) return;
+
+    try {
+      await logoutUser(); 
+      localStorage.removeItem('token');
+      localStorage.removeItem('user'); 
+      alert('로그아웃 되었습니다.');
+      navigate('/'); 
+    } catch (error) {
+      console.error("서버 로그아웃 통신 실패:", error);
+    }
+  };
 
   return (
     <div className="w-64 h-screen bg-slate-900 text-white flex flex-col fixed left-0 top-0 overflow-y-auto">
@@ -102,7 +120,7 @@ const Sidebar = () => {
       
       {/* 3. 하단 로그아웃 */}
       <div className="p-4 border-t border-slate-800">
-        <button className="w-full text-left px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">
+        <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">
           로그아웃
         </button>
       </div>
