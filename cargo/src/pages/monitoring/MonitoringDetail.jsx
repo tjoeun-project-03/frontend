@@ -1,47 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
-import { Map, MapMarker, Polyline, useKakaoLoader, CustomOverlayMap } from 'react-kakao-maps-sdk';
+import { Map, Polyline, useKakaoLoader, CustomOverlayMap } from 'react-kakao-maps-sdk';
+import { getOrderDetail } from '../../api/order';
 
 export const MonitoringDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [orderDetail, setOrderDetail] = useState(null);
 
-  const [loading, error] = useKakaoLoader({
+  const [loading] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_MAP_API_KEY,
     libraries: ["clusterer", "drawing", "services"],
   });
 
   useEffect(() => {
-    // 실제 환경에서는 여기서 API 호출: const res = await getOrderDetail(id);
-    // 제공해주신 SQL 데이터(ORDER_DETAIL) 구조를 그대로 매핑
-    setOrderDetail({
-      orderId: id,
-      invoiceNo: 'JIM-260226-A422', // 목록에서 전달받은 번호 가정
-      content: '가전',               // CONTENT
-      carType: '5t',               // CAR_TYPE
-      weight: 1.203747979525862,   // WEIGHT
-      freezer: 0,                  // FREEZER
-      departure: '대구역',           // DEPARTURE
-      arrival: '부산역',             // ARRIVAL
-      distance: 124.8,             // DISTANCE
-      clientNote: '1234',          // CLIENT_NOTE
-      consigneeName: 'ㅇㅇㅇ',       // CONSIGNEE_NAME
-      status: 'DELIVERING',
-      
-      // SQL 좌표 데이터
-      startLat: 35.87492772,       // START_LAT
-      startLng: 128.59600693,      // START_LNG
-      endLat: 35.11554918,         // END_LAT
-      endLng: 129.0403223,         // END_LNG
-      
-      // 실시간 수집 데이터 (백엔드에서 현재 좌표를 보내준다고 가정)
-      currentLat: 35.5049, 
-      currentLng: 128.8060,
-      driverName: '김기사',
-      vehicleInfo: '경북 82가 1234'
-    });
+    const fetchData = async () => {
+      try {
+        const response = await getOrderDetail(id);
+        setOrderDetail(response);
+        response.currentLat = 35.87492772;
+        response.currentLng = 128.596000693;
+        console.log(response);
+      } catch (error) {
+        console.error("데이터 로드 실패:", error);
+      }
+    };
+    fetchData();
   }, [id]);
 
   if (!orderDetail) return <AdminLayout>데이터를 불러오는 중입니다...</AdminLayout>;
@@ -121,12 +106,12 @@ export const MonitoringDetail = () => {
           <div className="bg-white rounded-2xl shadow-md border-4 border-white overflow-hidden h-[650px] relative">
             {!loading && (
               <Map 
-                center={{ lat: orderDetail.currentLat, lng: orderDetail.currentLng }} 
+                center={{ lat: Number(orderDetail.currentLat), lng: Number(orderDetail.currentLng) }}
                 style={{ width: "100%", height: "100%" }}
                 level={9} 
               >
-                {/* 1. 출발지 마커 (Green Label) */}
-                <CustomOverlayMap position={{ lat: orderDetail.startLat, lng: orderDetail.startLng }}>
+                {/* 1. 출발지 마커  */}
+                <CustomOverlayMap position={{ lat: Number(orderDetail.startLat), lng: Number(orderDetail.startLng) }}>
                   <div className="flex flex-col items-center">
                     <div className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg border border-white mb-1">
                       출발
@@ -135,8 +120,8 @@ export const MonitoringDetail = () => {
                   </div>
                 </CustomOverlayMap>
 
-                {/* 2. 도착지 마커 (Red Label) */}
-                <CustomOverlayMap position={{ lat: orderDetail.endLat, lng: orderDetail.endLng }}>
+                {/* 2. 도착지 마커 */}
+                <CustomOverlayMap position={{ lat: Number(orderDetail.endLat), lng: Number(orderDetail.endLng) }}>
                   <div className="flex flex-col items-center">
                     <div className="bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg border border-white mb-1">
                       도착
@@ -147,7 +132,7 @@ export const MonitoringDetail = () => {
 
                 {/* 현재 위치 마커 */}
                 <CustomOverlayMap 
-                  position={{ lat: orderDetail.currentLat, lng: orderDetail.currentLng }}
+                  position={{ lat: Number(orderDetail.currentLat), lng: Number(orderDetail.currentLng) }}
                 >
                   {/* 이제 아래 div만 순수하게 화면에 나타납니다 */}
                   <div className="relative flex items-center justify-center">
@@ -165,9 +150,9 @@ export const MonitoringDetail = () => {
                 {/* 경로 선 (DB의 시작-현재-끝 좌표 연결) */}
                 <Polyline
                   path={[
-                    { lat: orderDetail.startLat, lng: orderDetail.startLng },
-                    { lat: orderDetail.currentLat, lng: orderDetail.currentLng },
-                    { lat: orderDetail.endLat, lng: orderDetail.endLng }
+                    { lat: Number(orderDetail.startLat), lng: Number(orderDetail.startLng) },
+                    { lat: Number(orderDetail.currentLat), lng: Number(orderDetail.currentLng) },
+                    { lat: Number(orderDetail.endLat), lng: Number(orderDetail.endLng) }
                   ]}
                   strokeWeight={5}
                   strokeColor={"#3b82f6"}

@@ -9,3 +9,13 @@ export const getOrderList = async () => {
     });
     return response.data;
 }
+
+export const getOrderDetail = async(id) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:8080/api/orders/id/${id}`,{
+        headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
+    return response.data;
+} 
