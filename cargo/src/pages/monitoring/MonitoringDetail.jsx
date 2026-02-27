@@ -1,90 +1,181 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
-import { Map, MapMarker, useKakaoLoader} from 'react-kakao-maps-sdk';
+import { Map, MapMarker, Polyline, useKakaoLoader, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MonitoringDetail = () => {
-  const { id } = useParams(); // URL에서 'ORD-260219-001' 같은 ID를 쏙 빼옵니다.
+  const { id } = useParams();
   const navigate = useNavigate();
   const [orderDetail, setOrderDetail] = useState(null);
 
   const [loading, error] = useKakaoLoader({
-    appkey: import.meta.env.VITE_KAKAO_MAP_API_KEY, // .env에 적어둔 키를 리액트 방식으로 가져옴
+    appkey: import.meta.env.VITE_KAKAO_MAP_API_KEY,
     libraries: ["clusterer", "drawing", "services"],
   });
 
   useEffect(() => {
-    // 💡 백엔드 통신 위치: id를 가지고 이 배차의 모든 상세 정보와 위경도를 가져옵니다.
-    // fetchDetail(id);
-    
-    // (임시 더미 데이터)
+    // 실제 환경에서는 여기서 API 호출: const res = await getOrderDetail(id);
+    // 제공해주신 SQL 데이터(ORDER_DETAIL) 구조를 그대로 매핑
     setOrderDetail({
-      id: id,
+      orderId: id,
+      invoiceNo: 'JIM-260226-A422', // 목록에서 전달받은 번호 가정
+      content: '가전',               // CONTENT
+      carType: '5t',               // CAR_TYPE
+      weight: 1.203747979525862,   // WEIGHT
+      freezer: 0,                  // FREEZER
+      departure: '대구역',           // DEPARTURE
+      arrival: '부산역',             // ARRIVAL
+      distance: 124.8,             // DISTANCE
+      clientNote: '1234',          // CLIENT_NOTE
+      consigneeName: 'ㅇㅇㅇ',       // CONSIGNEE_NAME
       status: 'DELIVERING',
-      shipperName: '(주)대한물류',
+      
+      // SQL 좌표 데이터
+      startLat: 35.87492772,       // START_LAT
+      startLng: 128.59600693,      // START_LNG
+      endLat: 35.11554918,         // END_LAT
+      endLng: 129.0403223,         // END_LNG
+      
+      // 실시간 수집 데이터 (백엔드에서 현재 좌표를 보내준다고 가정)
+      currentLat: 35.5049, 
+      currentLng: 128.8060,
       driverName: '김기사',
-      vehicleInfo: '서울 82가 1234 (5톤 윙바디)',
-      origin: '경기 파주시',
-      destination: '부산 강서구',
-      currentLocation: '경부고속도로 천안JC 부근',
-      lat: 36.8406, // 백엔드에서 받아온 위도
-      lng: 127.1738 // 백엔드에서 받아온 경도
+      vehicleInfo: '경북 82가 1234'
     });
   }, [id]);
 
-  if (!orderDetail) return <AdminLayout>로딩 중...</AdminLayout>;
+  if (!orderDetail) return <AdminLayout>데이터를 불러오는 중입니다...</AdminLayout>;
 
   return (
     <AdminLayout>
-      {/* 상단: 타이틀 및 뒤로가기 */}
-      <div className="flex items-center space-x-3 mb-6">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="text-gray-400 hover:text-gray-600 text-xl font-bold transition-colors"
-        >
-          ←
-        </button>
-        <h2 className="text-2xl font-bold text-gray-800">배송 상세 관제</h2>
-        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold ml-2">
-          {orderDetail.status === 'DELIVERING' ? '배송 중' : '배차 완료'}
-        </span>
+      {/* 1. 상단 헤더: 제목 및 기본 식별 정보 */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-4">
+          <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <span className="text-xl">←</span>
+          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">배송 상세 관제</h2>
+            <p className="text-sm text-gray-500 font-medium">
+              주문 ID: {orderDetail.orderId} | 운송장: {orderDetail.invoiceNo}
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        {/* 1. 상단: 배차 상세 정보 카드 */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">주문 번호</p>
-            <p className="font-bold text-gray-800 text-lg">{orderDetail.id}</p>
+        {/* 2. 왼쪽: DB 리소스 대시보드 */}
+        <div className="lg:col-span-1 space-y-6">
+          
+          {/* 경로 정보 카드 */}
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">운송 정보</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-gray-500 text-sm">출발지</span>
+                <span className="font-bold text-sm text-gray-800">{orderDetail.departure}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="text-gray-500 text-sm">도착지</span>
+                <span className="font-bold text-sm text-gray-800">{orderDetail.arrival}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500 text-sm">총 거리</span>
+                <span className="font-bold text-sm text-gray-800">{orderDetail.distance}km</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 mb-1">경로 (출발 ➔ 도착)</p>
-            <p className="font-bold text-gray-800 text-lg">{orderDetail.origin} ➔ {orderDetail.destination}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500 mb-1">차주 및 차량 정보</p>
-            <p className="font-bold text-gray-800 text-lg">{orderDetail.driverName} <span className="text-sm font-normal text-gray-600">({orderDetail.vehicleInfo})</span></p>
+
+          {/* 화물 및 차량 상세 카드 */}
+          <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">화물/차량 정보</h3>
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-gray-400">품목 / 중량</p>
+                <p className="font-bold text-gray-800">
+                  {orderDetail.content} / {orderDetail.weight.toFixed(2)}t
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400">차량 및 차주</p>
+                <p className="font-bold text-gray-800">{orderDetail.driverName}</p>
+                <p className="text-xs text-gray-500">{orderDetail.vehicleInfo} ({orderDetail.carType})</p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-gray-50 p-2 rounded text-center">
+                  <p className="text-[10px] text-gray-400">냉동 여부</p>
+                  <p className="text-xs font-bold">{orderDetail.freezer === 1 ? '냉동' : '상온'}</p>
+                </div>
+                <div className="bg-gray-50 p-2 rounded text-center">
+                  <p className="text-[10px] text-gray-400">비고</p>
+                  <p className="text-xs font-bold">{orderDetail.clientNote || '-'}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-[500px] relative">
-          
-          <div className="absolute top-4 left-4 z-10 bg-white/90 p-4 rounded-lg shadow-md backdrop-blur-sm">
-            <p className="text-xs text-gray-500 font-bold mb-1">현재 위치 보고</p>
-            <p className="text-lg font-bold text-blue-700">{orderDetail.currentLocation}</p>
-          </div>
+        {/* 3. 오른쪽: 지도 관제 영역 */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-2xl shadow-md border-4 border-white overflow-hidden h-[650px] relative">
+            {!loading && (
+              <Map 
+                center={{ lat: orderDetail.currentLat, lng: orderDetail.currentLng }} 
+                style={{ width: "100%", height: "100%" }}
+                level={9} 
+              >
+                {/* 1. 출발지 마커 (Green Label) */}
+                <CustomOverlayMap position={{ lat: orderDetail.startLat, lng: orderDetail.startLng }}>
+                  <div className="flex flex-col items-center">
+                    <div className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg border border-white mb-1">
+                      출발
+                    </div>
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full border-2 border-white shadow-md"></div>
+                  </div>
+                </CustomOverlayMap>
 
-          <Map 
-            key={`${orderDetail.lat}-${orderDetail.lng}`} // 💡 좌표 데이터가 로드되면 지도를 강제로 다시 그립니다.
-            center={{ lat: orderDetail.lat, lng: orderDetail.lng }} 
-            style={{ width: "100%", height: "500px" }}
-            level={4} 
-          >
-            <MapMarker position={{ lat: orderDetail.lat, lng: orderDetail.lng }}>
-              <div style={{ padding: "5px", color: "#000" }}>현재 위치</div>
-            </MapMarker>
-          </Map> 
+                {/* 2. 도착지 마커 (Red Label) */}
+                <CustomOverlayMap position={{ lat: orderDetail.endLat, lng: orderDetail.endLng }}>
+                  <div className="flex flex-col items-center">
+                    <div className="bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg border border-white mb-1">
+                      도착
+                    </div>
+                    <div className="w-2 h-2 bg-rose-500 rounded-full border-2 border-white shadow-md"></div>
+                  </div>
+                </CustomOverlayMap>
+
+                {/* 현재 위치 마커 */}
+                <CustomOverlayMap 
+                  position={{ lat: orderDetail.currentLat, lng: orderDetail.currentLng }}
+                >
+                  {/* 이제 아래 div만 순수하게 화면에 나타납니다 */}
+                  <div className="relative flex items-center justify-center">
+                    {/* 펄스 애니메이션 */}
+                    <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-blue-400 opacity-60"></span>
+                    
+                    {/* 메인 마커 본체 */}
+                    <div className="relative inline-flex items-center space-x-2 bg-blue-600 text-white p-2.5 px-4 rounded-full shadow-lg border-2 border-white">
+                      <span className="text-lg">🚚</span> 
+                      <span className="text-xs font-bold whitespace-nowrap">현위치</span>
+                    </div>
+                  </div>
+                </CustomOverlayMap>
+
+                {/* 경로 선 (DB의 시작-현재-끝 좌표 연결) */}
+                <Polyline
+                  path={[
+                    { lat: orderDetail.startLat, lng: orderDetail.startLng },
+                    { lat: orderDetail.currentLat, lng: orderDetail.currentLng },
+                    { lat: orderDetail.endLat, lng: orderDetail.endLng }
+                  ]}
+                  strokeWeight={5}
+                  strokeColor={"#3b82f6"}
+                  strokeOpacity={0.7}
+                />
+              </Map> 
+            )}
+          </div>
         </div>
       </div>
     </AdminLayout>
