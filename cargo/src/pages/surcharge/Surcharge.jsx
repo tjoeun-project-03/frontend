@@ -76,16 +76,6 @@ export const SurchargeManage = () => {
           <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">상황별 할증 요금 설정</h3>
           
           <div className="space-y-4">
-            {/* 날씨 할증 */}
-            <div className="flex items-center space-x-4">
-              <label className="w-32 text-sm font-bold text-gray-700">날씨 할증</label>
-              <div className="relative flex-1">
-                <input type="number" name="weatherRule" value={pricing.weatherRule} onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right pr-8" />
-                <span className="absolute right-3 top-3 text-gray-500">%</span>
-              </div>
-            </div>
-
             {/* 심야 할증 */}
             <div className="flex items-center space-x-4">
               <label className="w-32 text-sm font-bold text-gray-700">심야 할증</label>

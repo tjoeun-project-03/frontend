@@ -71,10 +71,6 @@ export const DashboardPage = () => {
             {/* 할증 목록 */}
             <div className="pt-2 border-t border-gray-100 space-y-3">
               <div className="flex justify-between items-center px-2">
-                <span className="text-sm text-gray-600">🌧️ 날씨 할증 (눈/비)</span>
-                <span className="text-sm font-bold text-gray-800">+{currentPricing.weatherRule}%</span>
-              </div>
-              <div className="flex justify-between items-center px-2">
                 <span className="text-sm text-gray-600">🌙 심야 할증 (22시~06시)</span>
                 <span className="text-sm font-bold text-gray-800">+{currentPricing.nightRule}%</span>
               </div>

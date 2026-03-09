@@ -69,7 +69,7 @@ export const InquiryList = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-16">번호</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-24">카테고리</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-32">카테고리</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b">제목</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-32">작성자</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b w-32">등록일</th>
