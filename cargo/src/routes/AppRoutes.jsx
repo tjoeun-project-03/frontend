@@ -9,7 +9,6 @@ import { NoticeList } from '../pages/notice/NoticeList';
 import { NoticeDetail } from '../pages/notice/NoticeDetail';
 import { ReportList } from '../pages/report/ReportList';
 import { ReportDetail } from '../pages/report/ReportDetail';
-import { DriverRequestList } from '../pages/driver/DriverRequestList';
 import { SanctionList } from '../pages/sanction/SanctionList';
 import { SurchargeManage } from '../pages/surcharge/Surcharge';
 import { RealTimeMonitoring } from '../pages/monitoring/RealTimeMonitoring';
@@ -32,7 +31,6 @@ export const AppRoutes = () => {
       <Route path="/notice/write/:id" element={<NoticeWrite />} /> {/* 공지사항 수정 */}
       <Route path="/report" element={<ReportList/>}/>{/* 신고목록 리스트 */}
       <Route path="/report/:id" element={<ReportDetail/>}/>{/* 신고 상세보기 */}
-      <Route path="/driver/request" element={<DriverRequestList/>}/>{/* 차주 신청 리스트 */}
       <Route path="/sanction/list" element={<SanctionList/>}/>{/* 제재 리스트 */}
       <Route path="/surcharge/manage" element={<SurchargeManage/>}/>{/* 수수료 및 할증 관리 */}
       <Route path="/monitoring" element={<RealTimeMonitoring/>}/>{/* 실시간 배송 모니터링 */}

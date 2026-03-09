@@ -17,7 +17,6 @@ const Sidebar = () => {
     {
       name: "회원 관리",
       items: [
-        { name: "차주 신청", path: "/driver/request" },
         { name: "사용자 제재", path: "/sanction/list" },
         { name: "유저 조회", path: "/user/list" },
       ]
