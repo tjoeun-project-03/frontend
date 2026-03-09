@@ -8,6 +8,7 @@ export const MonitoringDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [orderDetail, setOrderDetail] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
 
   const [loading] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_MAP_API_KEY,
@@ -19,14 +20,42 @@ export const MonitoringDetail = () => {
       try {
         const response = await getOrderDetail(id);
         setOrderDetail(response);
-        response.currentLat = 35.87492772;
-        response.currentLng = 128.596000693;
-        console.log(response);
+        
+        const lat = parseFloat(response.currentLat);
+        const lng = parseFloat(response.currentLng);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          setCurrentLocation({ lat, lng });
+        }
       } catch (error) {
         console.error("데이터 로드 실패:", error);
       }
     };
     fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    const wsUrl = `ws://localhost:8000/api/v1/tracking/ws/${id}`; 
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => console.log(`관리자 웹소켓 연결 성공! (주문번호: ${id})`);
+    
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.lat && data.lng) {
+          setCurrentLocation({ 
+            lat: parseFloat(data.lat), 
+            lng: parseFloat(data.lng) 
+          });
+        }
+      } catch (error) {
+        console.error("데이터 파싱 에러:", error);
+      }
+    };
+
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) ws.close();
+    };
   }, [id]);
 
   if (!orderDetail) return <AdminLayout>데이터를 불러오는 중입니다...</AdminLayout>;
@@ -106,7 +135,10 @@ export const MonitoringDetail = () => {
           <div className="bg-white rounded-2xl shadow-md border-4 border-white overflow-hidden h-[650px] relative">
             {!loading && (
               <Map 
-                center={{ lat: Number(orderDetail.currentLat), lng: Number(orderDetail.currentLng) }}
+                center={currentLocation 
+                  ? { lat: Number(currentLocation.lat), lng: Number(currentLocation.lng) }
+                  : { lat: Number(orderDetail.startLat), lng: Number(orderDetail.startLng) }
+                }
                 style={{ width: "100%", height: "100%" }}
                 level={9} 
               >
@@ -131,8 +163,9 @@ export const MonitoringDetail = () => {
                 </CustomOverlayMap>
 
                 {/* 현재 위치 마커 */}
-                <CustomOverlayMap 
-                  position={{ lat: Number(orderDetail.currentLat), lng: Number(orderDetail.currentLng) }}
+                {currentLocation && (
+                  <CustomOverlayMap 
+                  position={{ lat: Number(currentLocation.lat), lng: Number(currentLocation.lng) }}
                 >
                   {/* 이제 아래 div만 순수하게 화면에 나타납니다 */}
                   <div className="relative flex items-center justify-center">
@@ -146,12 +179,13 @@ export const MonitoringDetail = () => {
                     </div>
                   </div>
                 </CustomOverlayMap>
+                )}
 
                 {/* 경로 선 (DB의 시작-현재-끝 좌표 연결) */}
                 <Polyline
                   path={[
                     { lat: Number(orderDetail.startLat), lng: Number(orderDetail.startLng) },
-                    { lat: Number(orderDetail.currentLat), lng: Number(orderDetail.currentLng) },
+                    ...(currentLocation ? [{ lat: Number(currentLocation.lat), lng: Number(currentLocation.lng) }] : []),
                     { lat: Number(orderDetail.endLat), lng: Number(orderDetail.endLng) }
                   ]}
                   strokeWeight={5}

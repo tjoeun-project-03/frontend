@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/layout/AdminLayout';
-import { getOrderList } from '../../api/order';
+import { getOrderList, orderCancel } from '../../api/order';
 
 export const RealTimeMonitoring = () => {
   const navigate = useNavigate();
@@ -9,15 +9,18 @@ export const RealTimeMonitoring = () => {
 
   // 1. 배차 취소 로직
   const handleCancelDispatch = (id) => {
-    if (window.confirm(`[주문번호: ${id}] 해당 배차를 정말 취소하시겠습니까?`)) {
-      try {
-        // 실제 운영 시: await cancelOrder(id);
-        alert('배차가 취소되었습니다.');
-        setOrders(orders.filter(order => order.orderId !== id));
-      } catch (error) {
-        console.error('취소 실패:', error);
+    const fetchData = async () => {
+      if (window.confirm(`[주문번호: ${id}] 해당 배차를 정말 취소하시겠습니까?`)) {
+        try {
+          await orderCancel(id);
+          alert('배차가 취소되었습니다.');
+          setOrders(orders.filter(order => order.orderId !== id));
+        } catch (error) {
+          console.error('취소 실패:', error);
+        }
       }
-    }
+    };
+    fetchData(); 
   };
 
   // 2. 데이터 페칭 (ISO 날짜 처리 포함)
@@ -25,8 +28,8 @@ export const RealTimeMonitoring = () => {
     const fetchData = async () => {
       try {
         const response = await getOrderList();
-        // 데이터가 배열인지 확인 후 저장
         setOrders(Array.isArray(response) ? response : []);
+        console.log(response);
       } catch (error) {
         console.error("데이터 로드 실패:", error);
       }
