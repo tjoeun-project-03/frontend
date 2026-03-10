@@ -24,8 +24,8 @@ const Sidebar = () => {
     {
       name: "고객 지원",
       items: [
-        { name: "신고 심사", path: "/report" },
         { name: "1:1 문의 답변", path: "/inquiry"},
+        { name: "신고 심사", path: "/report" },
         { name: "공지사항 관리", path: "/notice" },
       ]
     }

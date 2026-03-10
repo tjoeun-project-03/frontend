@@ -2,15 +2,30 @@ import React, {useState, useEffect} from 'react';
 import AdminLayout from '../components/layout/AdminLayout';
 import { getSurcharge } from '../api/surcharge';
 import { useNavigate } from 'react-router-dom';
+import { getReportList } from '../api/report';
+import { getInquiryList } from '../api/inquiry';
+import { getUser } from '../api/login';
+import { getOrderList } from '../api/order';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const [currentPricing, setCurrentPricing] = useState({});
+  const [reportCount, setReportCount] = useState(0);
+  const [inquiryCount, setInquiryCount] = useState(0);
+  const [userCount, setUserCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+
+
+
 
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const pricing = await getSurcharge(); 
+        const pricing = await getSurcharge();
+        setReportCount(await getReportCount());
+        setInquiryCount(await getInquiryCount());
+        setUserCount(await getUserCount());
+        setOrderCount(await getOrderCount());
         setCurrentPricing(pricing);
       } catch (error) {
         console.error('수수료 데이터를 불러오는 중 에러 발생:', error);
@@ -29,10 +44,10 @@ export const DashboardPage = () => {
 
       {/* 1. 실무형 요약 카드 영역 (To-Do & 알림 위주) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <StatCard title="정산 대기 (미승인)" value="0 건" color="bg-blue-500" textColor="text-blue-600" onClick={() => navigate('/settlement')} />
-        <StatCard title="미처리 신고 접수" value="0 건" color="bg-red-500" textColor="text-red-600" onClick={() => navigate('/report')} />
-        <StatCard title="배차 지연 (30분 초과)" value="0 건" color="bg-amber-500" textColor="text-amber-600" onClick={() => {}} />
-        <StatCard title="현재 실시간 배송 중" value="0 건" color="bg-green-500" textColor="text-green-600" onClick={() => navigate('/monitoring')} />
+        <StatCard title="읽지 않은 문의" value={`${inquiryCount} 건`} color="bg-blue-500" textColor="text-blue-600" onClick={() => navigate('/inquiry')} />
+        <StatCard title="미처리 신고 접수" value={`${reportCount} 건`} color="bg-red-500" textColor="text-red-600" onClick={() => navigate('/report')} />
+        <StatCard title="누적 사용자 수" value={`${userCount} 명`} color="bg-amber-500" textColor="text-amber-600" onClick={() => {navigate('/user/list')}} />
+        <StatCard title="현재 실시간 배송 중" value={`${orderCount} 건`}color="bg-green-500" textColor="text-green-600" onClick={() => navigate('/monitoring')} />
       </div>
 
       {/* 2. 메인 컨텐츠 영역 (좌: 목록, 우: 수수료 정책) */}
@@ -108,3 +123,59 @@ const StatCard = ({ title, value, color, textColor, onClick }) => (
     </div>
   </div>
 );
+
+
+// 미처리 신고 접수
+const getReportCount = async() => {
+  try {
+    let count = 0;
+    const response = await getReportList();
+    for(let i = 0; i < response.length; i++){
+      if(response[i].status == 'PENDING'){
+        count++;
+      }
+    }
+    return count;
+  } catch(e){
+      console.log(e);
+  }
+}
+
+// 읽지 않은 문의
+const getInquiryCount = async() => {
+  try {
+    let count = 0;
+    const response = await getInquiryList();
+    for(let i = 0; i < response.length; i++){
+      if(response[i].status == 'WAITING'){
+        count++;
+      }
+    }
+    return count;
+  } catch(e){
+    console.log(e);
+  }
+}
+
+// 누적 사용자 수
+const getUserCount = async() => {
+  try {
+    const response = await getUser();
+    let count = response.length;
+    return count;
+  } catch(e){
+    console.log(e);
+  }
+}
+
+// 현재 배송 진행중 수
+const getOrderCount = async() => {
+  try {
+    let count = 0;
+    const response = await getOrderList();
+    count = response.length;
+    return count;
+  } catch(e){
+    console.log(e);
+  }
+}

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getInquiryList = async (id) => {
+export const getInquiryList = async () => {
     const token = localStorage.getItem('token');
     const response = await axios.get(`http://localhost:8080/api/inquiries/admin/all`,{
         headers: {

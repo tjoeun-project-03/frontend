@@ -8,6 +8,7 @@ export const InquiryList = () => {
 
   const [inquiries, setInquiries] = useState([]); // 초기값 (빈 배열)
   const [isLoading, setIsLoading] = useState(false); // 로딩 상태 (선택사항) 
+  const [filterStatus, setFilterStatus] = useState('PENDING'); // 필터 상태: ALL, PENDING, COMPLETED
 
   useEffect(() => {
       const fetchData = async () => {
@@ -50,11 +51,42 @@ export const InquiryList = () => {
     navigate(`/inquiry/${id}`, {state: item});
   };
 
+  // 필터링 로직
+  const filteredInquiries = inquiries.filter((item) => {
+    if (filterStatus === 'COMPLETED') return item.status === 'COMPLETED';
+    if (filterStatus === 'PENDING') return item.status !== 'COMPLETED';
+    return true;
+  });
+
   return (
     <AdminLayout>
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800">1:1 문의 관리</h2>
         <p className="text-gray-500 mt-1">접수된 문의를 확인하고 답변을 등록하세요.</p>
+      </div>
+
+      {/* 필터 버튼 영역 */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setFilterStatus('PENDING')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            filterStatus === 'PENDING'
+              ? 'bg-red-100 text-red-800 border border-red-200'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          답변대기
+        </button>
+        <button
+          onClick={() => setFilterStatus('COMPLETED')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            filterStatus === 'COMPLETED'
+              ? 'bg-green-100 text-green-800 border border-green-200'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          답변완료
+        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -79,15 +111,15 @@ export const InquiryList = () => {
             <tbody className="divide-y divide-gray-100">
               
               {/* 2. 데이터가 없을 때 처리 */}
-              {inquiries.length === 0 ? (
+              {filteredInquiries.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="p-10 text-center text-gray-500">
-                    접수된 문의가 없습니다.
+                    {filterStatus === 'ALL' ? '접수된 문의가 없습니다.' : '해당 상태의 문의가 없습니다.'}
                   </td>
                 </tr>
               ) : (
                 /* 3. 안전하게 옵셔널 체이닝(?.) 사용 */
-                inquiries?.map((item) => (
+                filteredInquiries?.map((item) => (
                   <tr 
                     key={item.id} 
                     onClick={() => handleRowClick(item.id, item)}
