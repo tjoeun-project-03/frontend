@@ -6,6 +6,8 @@ export const SanctionList = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [selectedUser, setSelectedUser] = useState(null);
+
   useEffect(() => {
     fetchSanctionList();
   }, []);
@@ -30,7 +32,6 @@ export const SanctionList = () => {
     const banDate = new Date(banUntil);
     const currentYear = banDate.getFullYear();
 
-    // 백엔드에서 LocalDateTime.MAX를 쓰면 연도가 9999년 등으로 아주 큽니다.
     if (currentYear > 9000) {
       return (
         <span className="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
@@ -71,7 +72,8 @@ export const SanctionList = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-16">번호</th>
-                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-32">이름</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-32">유저 정보</th>
+                <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-32 text-center">제재 유형</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b w-64">정지 해제 일시</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b">제재 사유</th>
                 <th className="p-4 text-xs font-semibold text-gray-500 uppercase border-b text-center w-24">관리</th>
@@ -79,9 +81,9 @@ export const SanctionList = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               
-              {/* 3. 컬럼 개수가 줄었으므로 colSpan을 7에서 6으로 변경 */}
               {users.length === 0 ? (
                 <tr>
+                  {/* 컬럼 개수가 6개로 늘어났으므로 colSpan을 6으로 변경 */}
                   <td colSpan="6" className="p-10 text-center text-gray-500">
                     현재 제재 중인 유저가 없습니다.
                   </td>
@@ -91,7 +93,11 @@ export const SanctionList = () => {
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 text-gray-600 font-medium">{user.id}</td>
                     <td className="p-4">
-                      <p className="text-gray-900 font-bold">{user.reportedUserName}</p>
+                      <p className="text-gray-900 font-bold">{user.reportedUserId}</p>
+                      <p className="text-xs text-gray-500">{user.reportedUserName}</p>
+                    </td>
+                    <td className="p-4 text-center">
+                      {getSanctionBadge(user.banUntil)}
                     </td>
                     <td className="p-4 text-gray-700 font-medium text-sm">
                       {formatBanDate(user.banUntil)}
@@ -101,7 +107,8 @@ export const SanctionList = () => {
                     </td>
                     <td className="p-4 text-center">
                       <button 
-                        onClick={() => alert('나중에 유저 상세 페이지로 이동시키면 좋습니다!')}
+                        // 💡 수정: 클릭 시 해당 줄의 user 데이터를 selectedUser에 통째로 넣습니다!
+                        onClick={() => setSelectedUser(user)} 
                         className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-600 hover:bg-white"
                       >
                         상세
@@ -114,6 +121,58 @@ export const SanctionList = () => {
           </table>
         )}
       </div>
+      {selectedUser && (
+        // 뒷배경을 까맣게 덮는 오버레이
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
+            
+            {/* 모달 헤더 */}
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-800">제재 상세 정보</h3>
+              <button 
+                onClick={() => setSelectedUser(null)} 
+                className="text-gray-400 hover:text-gray-800 text-2xl font-bold"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="flex justify-between items-end border-b pb-3">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">유저 이름 (ID: {selectedUser.id})</p>
+                  <p className="text-xl font-bold text-gray-900">{selectedUser.reportedUserName}</p>
+                </div>
+                {getSanctionBadge(selectedUser.banUntil)}
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500 mb-1">정지 해제 일시</p>
+                <p className="text-sm font-bold text-red-600">
+                  {formatBanDate(selectedUser.banUntil)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500 mb-1">제재 상세 사유</p>
+                <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 min-h-[80px] whitespace-pre-wrap">
+                  {selectedUser.penalty}
+                </div>
+              </div>
+            </div>
+
+            {/* 모달 푸터 (버튼) */}
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end bg-gray-50">
+              <button 
+                onClick={() => setSelectedUser(null)}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };
