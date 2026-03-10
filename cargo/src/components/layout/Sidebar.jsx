@@ -22,13 +22,6 @@ const Sidebar = () => {
       ]
     },
     {
-      name: "재무/정산",
-      items: [
-        { name: "매출 통계", path: "/revenue" },
-        { name: "차주 정산 승인", path: "/settlement" },
-      ]
-    },
-    {
       name: "고객 지원",
       items: [
         { name: "신고 심사", path: "/report" },
