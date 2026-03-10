@@ -20,9 +20,16 @@ export const getOrderDetail = async(id) => {
     return response.data;
 } 
 
-export const orderCancel = async(id) => {
+export const orderCancel = async(id, reason) => {
   const token = localStorage.getItem('token');
-  const response = await axios.delete(`http://localhost:8080/api/orders/${id}/delete`,{
+
+  const requestData = {
+    canceledReason: reason
+  }
+
+  const response = await axios.post(`http://localhost:8080/api/orders/${id}/cancel`,
+    requestData,
+    {
       headers: {
       Authorization: `Bearer ${token}`
     },

@@ -12,7 +12,8 @@ export const RealTimeMonitoring = () => {
     const fetchData = async () => {
       if (window.confirm(`[주문번호: ${id}] 해당 배차를 정말 취소하시겠습니까?`)) {
         try {
-          await orderCancel(id);
+          const reason = window.prompt(`취소 사유를 입력해주세요`);
+          await orderCancel(id, reason);
           alert('배차가 취소되었습니다.');
           setOrders(orders.filter(order => order.orderId !== id));
         } catch (error) {
@@ -136,7 +137,7 @@ export const RealTimeMonitoring = () => {
                         onClick={() => handleCancelDispatch(order.orderId)}
                         className="w-full max-w-[90px] px-3 py-2 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                       >
-                        취소
+                        배차 취소
                       </button>
                     </div>
                   </td>
