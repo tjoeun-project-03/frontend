@@ -34,7 +34,7 @@ export const MonitoringDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    const wsUrl = `ws://localhost:8000/api/v1/tracking/ws/${id}`; 
+    const wsUrl = `ws://52.204.62.127:8000/api/v1/tracking/ws/${id}`; 
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => console.log(`관리자 웹소켓 연결 성공! (주문번호: ${id})`);

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const getOrderList = async () => {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:8080/api/orders/available',{
+    const response = await axios.get('http://52.204.62.127:8080/api/orders/available',{
         headers: {
         Authorization: `Bearer ${token}`
       },
@@ -12,7 +12,7 @@ export const getOrderList = async () => {
 
 export const getOrderDetail = async(id) => {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`http://localhost:8080/api/orders/id/${id}`,{
+    const response = await axios.get(`http://52.204.62.127:8080/api/orders/id/${id}`,{
         headers: {
         Authorization: `Bearer ${token}`
       },
@@ -27,7 +27,7 @@ export const orderCancel = async(id, reason) => {
     canceledReason: reason
   }
 
-  const response = await axios.post(`http://localhost:8080/api/orders/${id}/cancel`,
+  const response = await axios.post(`http://52.204.62.127:8080/api/orders/${id}/cancel`,
     requestData,
     {
       headers: {

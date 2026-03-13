@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const getNoticeList = async () => {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:8080/api/notices',{
+    const response = await axios.get('http://52.204.62.127:8080/api/notices',{
         headers: {
         Authorization: `Bearer ${token}`
       },
@@ -12,7 +12,7 @@ export const getNoticeList = async () => {
 
 export const getNoticeDetail = async (id) => {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`http://localhost:8080/api/notices/${id}`,{
+    const response = await axios.get(`http://52.204.62.127:8080/api/notices/${id}`,{
         headers: {
         Authorization: `Bearer ${token}`
       },
@@ -22,7 +22,7 @@ export const getNoticeDetail = async (id) => {
 
 export const deleteNotice = async (id) => {
   const token = localStorage.getItem('token');
-  const response = await axios.delete(`http://localhost:8080/api/notices/${id}`,{
+  const response = await axios.delete(`http://52.204.62.127:8080/api/notices/${id}`,{
     headers: {
       Authorization: `Bearer ${token}`
     },
@@ -32,7 +32,7 @@ export const deleteNotice = async (id) => {
 
 export const createNotice = async (data) => {
   const token = localStorage.getItem('token');
-  const response = await axios.post(`http://localhost:8080/api/notices`,{
+  const response = await axios.post(`http://52.204.62.127:8080/api/notices`,{
     title: data.title,
     content: data.content,
     target: data.target,
@@ -47,7 +47,7 @@ export const createNotice = async (data) => {
 
 export const updateNotice = async (data, id) => {
   const token = localStorage.getItem('token');
-  const response = await axios.put(`http://localhost:8080/api/notices/${id}`,{
+  const response = await axios.put(`http://52.204.62.127:8080/api/notices/${id}`,{
     title: data.title,
     content: data.content,
     target: data.target,
