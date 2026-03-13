@@ -5,7 +5,7 @@ import Header from './Header';
 // children: 이 레이아웃 안에 들어올 실제 페이지 내용 (Dashboard, MemberPage 등)
 const AdminLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* 1. 사이드바 (고정) */}
       <Sidebar />
 

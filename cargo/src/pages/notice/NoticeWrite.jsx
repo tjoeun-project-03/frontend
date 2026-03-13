@@ -11,23 +11,26 @@ export const NoticeWrite = () => {
   const detailData = location.state;
   const isEditMode = Boolean(id);
 
-  const [form, setForm] = useState({
-    title: '',
-    content: '',
-    target: 0,
-    pinned: false,
-  });
-
-  useEffect(() => {
-    if (isEditMode) {
-      setForm({
+  // useState 초기값 함수에서 조건에 따라 초기 상태를 설정 (Lazy Initialization)
+  const [form, setForm] = useState(() => {
+    if (isEditMode && detailData) {
+      return {
         title: detailData.title,
         content: detailData.content,
         target: detailData.target,
         pinned: detailData.pinned,
-      });
+      };
     }
-  }, [id, isEditMode]);
+    return { title: '', content: '', target: 0, pinned: false };
+  });
+
+  useEffect(() => {
+    // 수정 모드인데 데이터가 없는 경우(새로고침 등) 예외 처리
+    if (isEditMode && !detailData) {
+      alert("잘못된 접근이거나 데이터가 없습니다.");
+      navigate('/notice');
+    }
+  }, [isEditMode, detailData, navigate]);
 
   // 2. 핸들러 수정 (숫자 변환 로직 추가)
   const handleChange = (e) => {
@@ -65,6 +68,7 @@ export const NoticeWrite = () => {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
             {form ? '공지사항 수정' : '공지사항 등록'}
+            {isEditMode ? '공지사항 수정' : '공지사항 등록'}
           </h2>
           <button 
             onClick={() => navigate(-1)} 
@@ -101,6 +105,21 @@ export const NoticeWrite = () => {
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">공지 대상</label>
               <div className="flex items-center gap-6">
+
+                {/* 전체 (Value: 2) */}
+                <label className="flex items-center cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="target"
+                    value={2}
+                    checked={form.target === 2}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-gray-700 group-hover:text-blue-600 font-medium">
+                    전체
+                  </span>
+                </label>
                 
                 {/* 화주 (Value: 0) */}
                 <label className="flex items-center cursor-pointer group">

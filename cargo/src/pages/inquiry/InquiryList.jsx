@@ -66,10 +66,10 @@ export const InquiryList = () => {
       </div>
 
       {/* 필터 버튼 영역 */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex space-x-1 bg-blue-100/50 p-1 rounded-lg mb-6 w-fit">
         <button
           onClick={() => setFilterStatus('PENDING')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-6 py-2 rounded-md text-sm font-bold transition-colorss ${
             filterStatus === 'PENDING'
               ? 'bg-red-100 text-red-800 border border-red-200'
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
@@ -79,7 +79,7 @@ export const InquiryList = () => {
         </button>
         <button
           onClick={() => setFilterStatus('COMPLETED')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-6 py-2 rounded-md text-sm font-bold transition-colors ${
             filterStatus === 'COMPLETED'
               ? 'bg-green-100 text-green-800 border border-green-200'
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'

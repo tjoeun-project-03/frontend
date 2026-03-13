@@ -46,17 +46,20 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 h-screen bg-slate-900 text-white flex flex-col fixed left-0 top-0 overflow-y-auto">
+    <div className="w-64 h-screen bg-gray-50 text-gray-600 flex flex-col fixed left-0 top-0 z-50 border-r border-gray-200 font-sans shadow-xl">
       {/* 1. 로고 영역 */}
-      <div className="p-6 text-center border-b border-slate-800">
-        <Link to="/dashboard" className="text-2xl font-bold text-blue-400 block hover:text-blue-300 transition-colors">
-          화물 관리자
+      <div className="h-16 flex items-center px-6 border-b border-gray-200 bg-white">
+        <Link to="/dashboard" className="flex items-center gap-3 font-bold text-xl tracking-tight text-gray-800 hover:opacity-90 transition-opacity">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-blue-400 flex items-center justify-center text-white shadow-lg shadow-indigo-200 font-serif italic">
+            J
+          </div>
+          <span>Jim<span className="text-indigo-500">Line</span></span>
         </Link>
       </div>
 
       {/* 2. 메뉴 영역 */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-6"> {/* 카테고리 간 간격 */}
+      <nav className="flex-1 overflow-y-auto py-6 px-4 custom-scrollbar">
+        <ul className="space-y-8"> {/* 카테고리 간 간격 넓힘 */}
           
           {menus.map((menu, index) => (
             <li key={index}>
@@ -64,24 +67,25 @@ const Sidebar = () => {
               {/* (A) 하위 메뉴가 있는 경우: 제목으로 표시 */}
               {menu.items ? (
                 <div>
-                  <div className="flex items-center text-slate-400 text-sm font-bold mb-2 px-2 uppercase tracking-wider">
-                    <span className="mr-2"></span>
+                  <div className="px-2 mb-3 text-xs font-bold text-gray-400 uppercase tracking-wider">
                     {menu.name}
                   </div>
                   {/* 소분류 리스트 */}
-                  <ul className="space-y-1 pl-4 border-l border-slate-700 ml-2">
+                  <ul className="space-y-1">
                     {menu.items.map((subItem, subIndex) => (
                       <li key={subIndex}>
                         <NavLink 
                           to={subItem.path}
                           className={({ isActive }) => 
-                            `block px-3 py-2 rounded-lg text-sm transition-colors ${
+                            `flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
                               isActive 
-                                ? "bg-blue-600 text-white font-medium" 
-                                : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                                ? "bg-white text-blue-600 shadow-sm translate-x-1" 
+                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-200"
                             }`
                           }
                         >
+                          {/* 아이콘 대신 불릿 포인트 활용 */}
+                          <span className="w-1.5 h-1.5 rounded-full mr-3 bg-current opacity-40 group-hover:opacity-100 transition-opacity"></span>
                           {subItem.name}
                         </NavLink>
                       </li>
@@ -93,14 +97,18 @@ const Sidebar = () => {
                 <NavLink 
                   to={menu.path}
                   className={({ isActive }) => 
-                    `flex items-center px-3 py-3 rounded-lg text-base font-medium transition-colors ${
+                    `flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       isActive 
-                        ? "bg-blue-600 text-white" 
-                        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                        ? "bg-white text-blue-600 shadow-sm" 
+                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-200"
                     }`
                   }
                 >
-                  <span className="mr-3">{menu.icon}</span>
+                  {menu.icon ? (
+                    <span className="mr-3">{menu.icon}</span>
+                  ) : (
+                    <span className="w-1.5 h-1.5 rounded-full mr-3 bg-current opacity-40"></span>
+                  )}
                   {menu.name}
                 </NavLink>
               )}
@@ -111,8 +119,12 @@ const Sidebar = () => {
       </nav>
       
       {/* 3. 하단 로그아웃 */}
-      <div className="p-4 border-t border-slate-800">
-        <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <button 
+          onClick={handleLogout} 
+          className="w-full flex items-center justify-center px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors group"
+        >
+          <span className="mr-2 group-hover:text-red-400 transition-colors">➔</span>
           로그아웃
         </button>
       </div>
