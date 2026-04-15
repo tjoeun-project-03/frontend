@@ -6,22 +6,43 @@ import { getOrderList, orderCancel } from '../../api/order';
 export const RealTimeMonitoring = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  // 1. 모달 상태 관리 (열림 여부, 취소할 주문 ID)
+  const [cancelModal, setCancelModal] = useState({ isOpen: false, orderId: null });
+  // 2. 입력받을 취소 사유 상태
+  const [cancelReason, setCancelReason] = useState('');
 
-  // 1. 배차 취소 로직
-  const handleCancelDispatch = (id) => {
-    const fetchData = async () => {
-      if (window.confirm(`[주문번호: ${id}] 해당 배차를 정말 취소하시겠습니까?`)) {
-        try {
-          const reason = window.prompt(`취소 사유를 입력해주세요`);
-          await orderCancel(id, reason);
-          alert('배차가 취소되었습니다.');
-          setOrders(orders.filter(order => order.orderId !== id));
-        } catch (error) {
-          console.error('취소 실패:', error);
-        }
-      }
-    };
-    fetchData(); 
+  // 3. 리스트에서 '취소' 버튼을 눌렀을 때 모달을 여는 함수
+  const handleOpenCancelModal = (id) => {
+    setCancelModal({ isOpen: true, orderId: id });
+    setCancelReason(''); // 모달 열 때 이전 입력값 초기화
+  };
+
+  // 4. 모달을 닫는 함수
+  const handleCloseCancelModal = () => {
+    setCancelModal({ isOpen: false, orderId: null });
+    setCancelReason('');
+  };
+
+  // 5. 모달 안에서 '확인'을 눌렀을 때 실행될 실제 취소 로직 (기존 코드 변형)
+  const executeCancel = async () => {
+    // 방어 코드: 사유를 입력하지 않았을 때
+    if (!cancelReason.trim()) {
+      alert("취소 사유를 반드시 입력해주세요.");
+      return;
+    }
+
+    try {
+      // cancelModal.orderId 에 저장해둔 ID를 꺼내서 씁니다.
+      await orderCancel(cancelModal.orderId, cancelReason);
+      
+      alert('배차가 취소되었습니다.');
+      setOrders(orders.filter(order => order.orderId !== cancelModal.orderId));
+      
+      handleCloseCancelModal(); // 성공 후 모달 닫기
+    } catch (error) {
+      console.error('취소 실패:', error);
+      alert('취소 처리 중 오류가 발생했습니다.');
+    }
   };
 
   // 2. 데이터 페칭 (ISO 날짜 처리 포함)
@@ -134,7 +155,7 @@ export const RealTimeMonitoring = () => {
                         상세/지도
                       </button>
                       <button 
-                        onClick={() => handleCancelDispatch(order.orderId)}
+                        onClick={() => handleOpenCancelModal(order.orderId)}
                         className="w-full max-w-[90px] px-3 py-2 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                       >
                         배차 취소
@@ -147,6 +168,60 @@ export const RealTimeMonitoring = () => {
           </table>
         </div>
       </div>
+
+      {/* 🚀 배차 취소 모달창 */}
+      {cancelModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
+            
+            {/* 헤더 */}
+            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-800">배차 취소</h3>
+              <button 
+                onClick={handleCloseCancelModal}
+                className="text-gray-400 hover:text-gray-800 text-xl font-bold"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* 본문 */}
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-700 font-medium">
+                [주문번호: <span className="text-blue-600">{cancelModal.orderId}</span>] 해당 배차를 정말 취소하시겠습니까?
+              </p>
+              
+              <div>
+                <label className="block text-xs text-gray-500 mb-2">취소 사유</label>
+                <textarea
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows="4"
+                  placeholder="관리자 취소 사유를 상세히 입력해주세요."
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                ></textarea>
+              </div>
+            </div>
+
+            {/* 푸터 (버튼 영역) */}
+            <div className="px-6 py-4 border-t border-gray-100 flex justify-end space-x-3 bg-gray-50">
+              <button 
+                onClick={handleCloseCancelModal}
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+              >
+                취소
+              </button>
+              <button 
+                onClick={executeCancel}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              >
+                확인
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };
